@@ -1,0 +1,13 @@
+{% if widget.errors %}
+    <p class="help-block text-danger">
+        {% for error in widget.errors %}
+            {{ error }}
+        {% endfor %}
+    </p>
+{% endif %}
+
+{% if widget.help_text %}
+    <p class="help-block">
+        <small class="text-muted">{{widget.help_text}}</small>
+    </p>
+{% endif %}

@@ -1,0 +1,69 @@
+{% load i18n %}{% load pretty_forms %}{% csrf_token %}
+
+{% if form.errors or form.non_field_errors %}
+    <div role="alert" class="alert alert-block fade in alert-danger">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% empty %}
+            {% trans "Please correct the errors in the form and try again." %}
+        {% endfor %}
+    </div>
+
+    {% for hidden in form.hidden_fields %}
+    {% if hidden.errors %}
+    <div role="alert" class="alert alert-block fade in alert-danger">
+         {% for error in hidden.errors %}
+            <p>{{hidden.label}} ({{ hidden.name }}): {{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endfor %}
+
+{% endif %}
+{% for widget in form.visible_fields %}
+    <div class="form-group{% if widget.errors %} has-error{% else %}{% if widget.form.is_bound %} has-success{% endif %}{% endif %}">
+        {% if widget|is_checkbox %}
+            <div class="col-sm-offset-3 col-sm-9">
+                <div class="checkbox">
+                    <label>
+                        {{ widget }} {{ widget.label }}
+                    </label>
+                </div>
+                {% include "bootstrap_form/_help_block.html" %}
+            </div>
+        {% elif widget|is_checkbox_multiple %}
+            <label class="control-label col-sm-3">{{ widget.label }}</label>
+
+            {% for sub_widget in widget %}
+            <div class="col-sm-offset-3 col-sm-9">
+                <div class="checkbox">
+                    {{ sub_widget }} {{ sub_widget.label }}
+                </div>
+                {% include "bootstrap_form/_help_block.html" %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <label class="control-label col-sm-3" for="{{ widget.auto_id }}">{{ widget.label }}</label>
+
+            <div class="col-sm-9">
+                {{ widget }}
+                {% include "bootstrap_form/_help_block.html" %}
+            </div>
+        {% endif %}
+
+    </div>
+{% endfor %}
+{% csrf_token %}
+{% for hidden in form.hidden_fields %}
+    {{hidden}}
+{% endfor %}
+<script type="text/javascript">
+    $(document).ready(function()
+                      {
+                          $('.form-group input[type=text]').addClass('form-control');
+                          $('.form-group input[type=number]').addClass('form-control');
+                          $('.form-group textarea').addClass('form-control');
+                          $('.form-group input[type=password]').addClass('form-control');
+                          $('.form-group input[type=email]').addClass('form-control');
+                      });
+</script>

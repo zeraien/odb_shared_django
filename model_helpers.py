@@ -11,11 +11,18 @@ from odb_shared import get_logger
 def do_text_markup(markup_language, content):
     if markup_language == "markdown":
         import markdown
-        content = markdown.to_html_string(content)
+        content = markdown.markdown(content)
     elif markup_language == 'textile':
         import textile
         content = textile.textile(content)
     return content
+
+class NamedTimeStampedModel(TimeStampedModel):
+    class Meta:
+        abstract = True
+    def __unicode__(self):
+        return self.name
+    name = models.CharField(_('name'), max_length=255)
 
 class JSONFieldBase(models.Field):
     __metaclass__ = models.SubfieldBase

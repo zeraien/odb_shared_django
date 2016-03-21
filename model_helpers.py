@@ -139,7 +139,7 @@ class MoneyField(models.DecimalField):
 
     def __init__(self, *args, **kwargs):
         kwargs.update(
-            default=0,
+            default=kwargs.get("default",0),
             max_digits=14,
             decimal_places=2)
         super(MoneyField, self).__init__(*args, **kwargs)

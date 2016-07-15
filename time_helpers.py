@@ -3,6 +3,7 @@ import datetime
 import re
 import calendar
 import pytz
+from django.conf import settings
 from django.utils import timezone
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
@@ -247,7 +248,9 @@ def to_date_object(date_or_datetime_object):
         raise TypeError("Object passed is not a date or datetime.")
 
 def get_midnight(dt_obj, add_days = 0):
-    return timezone.datetime(dt_obj.year, dt_obj.month, dt_obj.day)+timedelta(days=add_days)
+    tz = pytz.timezone(settings.TIME_ZONE)
+    midnight = timezone.datetime(dt_obj.year, dt_obj.month, dt_obj.day)+timedelta(days=add_days)
+    return tz.localize(midnight)
 
 def convert_to_pst(date):
     pst = pytz.timezone("US/Pacific")

@@ -9,6 +9,27 @@ from django.utils import timezone
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 FB_DATETIME_FORMAT  = '%Y-%m-%dT%H:%M:%S+0000'
 
+def get_list_of_monday_thru_friday_dates(selected_week_number=None):
+    """
+        pass a week number and get a list of dates starting on monday of that week.
+        if today is a saturday or sunday, return next week instead
+    """
+    current_week_number, current_weekday = datetime.datetime.now().isocalendar()[1:]
+
+    if selected_week_number is None:
+        selected_week_number = current_week_number
+
+    page = selected_week_number-current_week_number
+    current_monday = (datetime.datetime.now()-datetime.timedelta(days=current_weekday-1)).date()
+    selected_monday = current_monday+datetime.timedelta(weeks=page)
+
+    if current_weekday>5 and current_monday==selected_monday:
+        selected_monday += datetime.timedelta(days=7)
+        selected_week_number+=1
+    date_list = [(selected_monday+datetime.timedelta(days=d)) for d in range(0,5)]
+    return list(reversed(date_list))
+
+
 def range_days(start_date, duration_days, epoch = False):
     time_start = timezone.datetime(start_date.year, start_date.month, start_date.day)
     time_stop = timedelta(hours=24*duration_days)+time_start

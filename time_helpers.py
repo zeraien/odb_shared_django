@@ -15,15 +15,17 @@ def get_list_of_monday_thru_friday_dates(selected_week_number=None):
         if today is a saturday or sunday, return next week instead
     """
     current_week_number, current_weekday = datetime.datetime.now().isocalendar()[1:]
-
     if selected_week_number is None:
+        force = False
         selected_week_number = current_week_number
+    else:
+        force = True
 
     page = selected_week_number-current_week_number
     current_monday = (datetime.datetime.now()-datetime.timedelta(days=current_weekday-1)).date()
     selected_monday = current_monday+datetime.timedelta(weeks=page)
 
-    if current_weekday>5 and current_monday==selected_monday:
+    if not force and current_weekday>5 and current_monday==selected_monday:
         selected_monday += datetime.timedelta(days=7)
         selected_week_number+=1
     date_list = [(selected_monday+datetime.timedelta(days=d)) for d in range(0,5)]

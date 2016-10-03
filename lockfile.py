@@ -6,6 +6,8 @@ A timeout can be given to make sure the lockfile expires.
 
 """
 import atexit
+
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import smart_str
 import os
 import time
@@ -19,7 +21,7 @@ from odb_shared import get_logger
 
 class LockfileExistsException(Exception): pass
 
-class Monitor(object):
+class Monitor(ContextDecorator):
     """This class is used as such:
 
     with Monitor(data=(list_of_items), timeout=??):
@@ -32,14 +34,17 @@ class Monitor(object):
      If `with` statement is used with the `as` operator, the returned value is whether the
      monitor was initially locked. This is useful if you do not want to repeat a long running
      operation that just completed.
+
+     If passing `skip_if_already_locked`, the monitor will raise `LockfileExistsException` if
+     the lockfile already exists when this monitor is poked.
     """
-    def __init__(self, name, data, timeout=60):
+    def __init__(self, name, data, timeout=60, raise_if_already_locked=False):
 
         if timeout is None: timeout = 0
 
         self.timeout = timeout
         self.running_time = 0
-
+        self.raise_if_already_locked = raise_if_already_locked
         self.name = name
         self.digest = hashlib.sha1(smart_str(data) + name).hexdigest() + '-' + smart_str(name)[0:32]
         self.lockfile = Lockfile(self.digest)
@@ -50,6 +55,9 @@ class Monitor(object):
         get_logger().debug("[%s] Monitor [%s] check starting..." % (self.digest, self.name))
 
         was_locked_initially = self.lockfile.exists()
+
+        if was_locked_initially and self.raise_if_already_locked:
+            raise LockfileExistsException("%s already locked, bailing out."% self.digest)
 
         while self.lockfile.exists() and (self.timeout > 0 and self.running_time <= self.timeout):
             self.running_time += 1
@@ -136,7 +144,7 @@ class Lockfile(object):
         if os.path.exists(self.filename):
             try:
                 os.unlink(self.filename)
-            except OSError, e:
+            except OSError as e:
                 get_logger().warning("Tried to delete lockfile %s, but failed with error: %s. This should not be happening!" % (self.filename, e))
             finally:
                 global lockfiles
@@ -149,6 +157,24 @@ class Lockfile(object):
 
     def __repr__(self):
         return self.filename
+
+
+
+def lockfile_wait(name, raise_if_already_locked=True, timeout=60):
+    # Bare decorator: @lockfile_wait -- although the first argument is called
+    # `name_or_func`, it's actually the function being decorated.
+    name_or_func = name
+    if callable(name_or_func):
+        return Monitor(name=".".join((name_or_func.__module__,name_or_func.__name__)),
+                       raise_if_already_locked=raise_if_already_locked,
+                       data=[],
+                       timeout=timeout)(name_or_func)
+    # Decorator: @lockfile_wait(...) or context manager: with lockfile_wait(...): ...
+    else:
+        return Monitor(name=name_or_func,
+                       raise_if_already_locked=raise_if_already_locked,
+                       data=[],
+                       timeout=timeout)
 
 lockfiles = {}
 

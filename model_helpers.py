@@ -25,7 +25,6 @@ class NamedTimeStampedModel(TimeStampedModel):
     name = models.CharField(_('name'), max_length=255)
 
 class JSONFieldBase(models.Field):
-    __metaclass__ = models.SubfieldBase
     empty_strings_allowed = False
     prefix = "$json$"
     default_error_messages = {
@@ -45,6 +44,9 @@ class JSONFieldBase(models.Field):
                 raise django_exceptions.ValidationError(self.error_messages['invalid'])
 
         return value
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value=value)
 
     def to_python(self, value):
         is_str = type(value) in (str, unicode)
@@ -97,7 +99,9 @@ class PickledObject(str):
 
 
 class PickledObjectField(models.Field):
-    __metaclass__ = models.SubfieldBase
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value=value)
 
     def to_python(self, value):
         if isinstance(value, PickledObject):
@@ -130,7 +134,6 @@ class PickledObjectField(models.Field):
             raise TypeError('Lookup type %s is not supported.' % lookup_type)
 
 class MoneyField(models.DecimalField):
-    __metaclass__ = models.SubfieldBase
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("This value must be an integer."),
@@ -143,6 +146,9 @@ class MoneyField(models.DecimalField):
             max_digits=14,
             decimal_places=2)
         super(MoneyField, self).__init__(*args, **kwargs)
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value=value)
 
     def to_python(self, value):
         if value is None:

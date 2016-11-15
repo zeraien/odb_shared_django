@@ -271,7 +271,7 @@ def to_date_object(date_or_datetime_object):
         raise TypeError("Object passed is not a date or datetime.")
 
 def get_midnight(dt_obj, add_days = 0):
-    tz = pytz.timezone(settings.TIME_ZONE)
+    tz = timezone.get_current_timezone()
     midnight = timezone.datetime(dt_obj.year, dt_obj.month, dt_obj.day)+timedelta(days=add_days)
     return tz.localize(midnight)
 

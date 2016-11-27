@@ -7,6 +7,13 @@ from django import forms
 from django_extensions.db.models import TimeStampedModel
 from odb_shared import get_logger
 
+def simpleTitleComponent(field_name="title"):
+    class C(models.Model):
+        class Meta:
+            abstract = True
+        def __unicode__(self):
+            return getattr(self, field_name)
+    return C
 
 def do_text_markup(markup_language, content):
     if markup_language == "markdown":

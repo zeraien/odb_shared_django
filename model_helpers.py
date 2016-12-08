@@ -176,7 +176,7 @@ class MoneyField(models.DecimalField):
         defaults.update(kwargs)
         return super(MoneyField, self).formfield(**defaults)
 
-class DefaultModelManager(models.Manager):
+class DefaultModelManager(models.QuerySet):
     def visible(self, **kwargs):
         return self.filter(hidden=False, **kwargs)
 
@@ -185,7 +185,7 @@ class DefaultModel(TimeStampedModel):
     """
     Contains `created_at` and `last_modified_at` fields. Also hidden, and uses a special manager that has a "visible" filter option.
     """
-    objects = DefaultModelManager()
+    objects = DefaultModelManager.as_manager()
     hidden = models.BooleanField(_("hidden").capitalize(), default=False)
 
     class Meta:

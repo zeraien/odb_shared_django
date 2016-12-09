@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-15 06:49+0200\n"
+"POT-Creation-Date: 2016-12-09 01:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "version"
+msgstr "version"
+
+msgid "name"
+msgstr "namn"
 
 msgid "This value must be a valid JSON string."
 msgstr "Detta värde måste innehålla giltig JSON"
@@ -35,3 +41,19 @@ msgstr "dold"
 
 msgid "Please correct the errors in the form and try again."
 msgstr "Vänligen rätta felen i formuläret och försök igen."
+
+#, python-format
+msgid "%(seconds)ss"
+msgstr "%(seconds)s sek"
+
+#, python-format
+msgid "%(minutes)sm %(seconds)ss"
+msgstr "%(minutes)s min %(seconds)s sek"
+
+#, python-format
+msgid "%(hours)sh %(minutes)sm"
+msgstr "%(hours)s tim %(minutes)s min"
+
+#, python-format
+msgid "%(hours)sh %(minutes)sm %(seconds)ss"
+msgstr "%(hours)s tim %(minutes)s min %(seconds)s sek"

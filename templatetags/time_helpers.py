@@ -7,6 +7,8 @@ register = Library()
 
 @register.filter
 def time_from_minutes(total_minutes):
+    if total_minutes is None or type(total_minutes) not in (int, long, float):
+        total_minutes = 0
     return time_from_seconds(total_minutes*60.)
 time_from_minutes.is_safe=True
 

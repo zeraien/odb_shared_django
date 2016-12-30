@@ -6,30 +6,33 @@ import pytz
 from django.conf import settings
 from django.utils import timezone
 
+DATE_FORMAT = '%Y-%m-%d'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
 FB_DATETIME_FORMAT  = '%Y-%m-%dT%H:%M:%S+0000'
 
-def get_list_of_monday_thru_friday_dates(selected_week_number=None, include_weekend=False):
+def get_list_of_monday_thru_friday_dates(starting_date=None, include_weekend=False):
     """
         pass a week number and get a list of dates starting on monday of that week.
         if today is a saturday or sunday, return next week instead
     """
-    current_week_number, current_weekday = datetime.datetime.now().isocalendar()[1:]
-    if selected_week_number is None:
+    current_week_number, current_weekday = datetime.datetime.now().isocalendar()[1:3]
+    if starting_date is None:
         force = False
-        selected_week_number = current_week_number
+        starting_date = datetime.datetime.now()
     else:
         force = True
+    selected_week_number = starting_date.isocalendar()[1]
 
-    page = selected_week_number-current_week_number
-    current_monday = (datetime.datetime.now()-datetime.timedelta(days=current_weekday-1)).date()
-    selected_monday = current_monday+datetime.timedelta(weeks=page)
+    current_monday = (datetime.datetime.now()-datetime.timedelta(days=current_weekday-1))
+    selected_monday = (starting_date-datetime.timedelta(days=starting_date.isocalendar()[2]-1))
 
-    if not force and current_weekday>5 and current_monday==selected_monday:
+    if not force and current_weekday>5 and to_date_object(current_monday)==to_date_object(selected_monday):
+        # if today is already weekend, shift to next week
+        # xxx too automagical perhaps...
         selected_monday += datetime.timedelta(days=7)
         selected_week_number+=1
-    date_list = [(selected_monday+datetime.timedelta(days=d)) for d in range(0,include_weekend and 7 or 5 )]
-    return list(reversed(date_list))
+    date_list = [to_date_object(selected_monday+datetime.timedelta(days=d)) for d in range(0,include_weekend and 7 or 5 )]
+    return list(date_list)
 
 
 def range_days(start_date, duration_days, epoch = False):

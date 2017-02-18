@@ -339,7 +339,7 @@ def round_off(date_obj, round_to = 15):
                              microseconds=date_obj.microsecond)
     return date_obj
 
-def pretty_duration(sec, signed=False):
+def pretty_duration(sec):
     is_negative = sec<0
     sec = math.fabs(sec)
 
@@ -348,10 +348,10 @@ def pretty_duration(sec, signed=False):
     days, hours = divmod(hours, 24)
 
     days, hours, minutes, seconds = [int(d) for d in [days, hours, minutes, seconds]]
-    sign = signed and (is_negative and "-" or "+") or ""
-    if days > 0:
-        return ugettext(u"%s%sd %sh %sm") % (sign, days, hours, minutes)
-    elif hours<1:
-        return ugettext(u"%s%sm") % (sign, minutes,)
-
-    return ugettext(u"%s%sh %sm") % (sign, hours, minutes)
+    return {
+        'is_negative':is_negative,
+        'days':days,
+        'hours':hours,
+        'minutes':minutes,
+        'seconds':seconds
+    }

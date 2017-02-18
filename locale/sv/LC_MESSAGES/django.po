@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 01:26+0100\n"
+"POT-Creation-Date: 2017-02-18 14:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,17 +43,37 @@ msgid "Please correct the errors in the form and try again."
 msgstr "Vänligen rätta felen i formuläret och försök igen."
 
 #, python-format
+msgid "%(days)sd"
+msgstr "%(days)sd"
+
+#, python-format
+msgid "%(days)sd %(hours)sh %(minutes)sm"
+msgstr "%(days)sd %(hours)stim %(minutes)smin"
+
+#, python-format
+msgid "%(hours)sh"
+msgstr "%(hours)stim"
+
+#, python-format
+msgid "%(hours)sh %(minutes)sm"
+msgstr "%(hours)stim %(minutes)smin"
+
+#, python-format
+msgid "%(minutes)sm"
+msgstr "%(minutes)smin"
+
+#, python-format
 msgid "%(seconds)ss"
 msgstr "%(seconds)s sek"
 
 #, python-format
-msgid "%(minutes)sm %(seconds)ss"
-msgstr "%(minutes)s min %(seconds)s sek"
-
-#, python-format
-msgid "%(hours)sh %(minutes)sm"
-msgstr "%(hours)s tim %(minutes)s min"
+msgid "%(days)sd %(hours)sh %(minutes)sm %(seconds)ss"
+msgstr "%(days)sd %(hours)stim %(minutes)smin %(seconds)ssek"
 
 #, python-format
 msgid "%(hours)sh %(minutes)sm %(seconds)ss"
-msgstr "%(hours)s tim %(minutes)s min %(seconds)s sek"
+msgstr "%(hours)stim %(minutes)smin %(seconds)ssek"
+
+#, python-format
+msgid "%(minutes)sm %(seconds)ss"
+msgstr "%(minutes)smin %(seconds)ssek"

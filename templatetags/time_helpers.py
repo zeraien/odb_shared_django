@@ -3,6 +3,8 @@ from django.utils.translation import ugettext as _
 from django.template import Library
 from math import ceil, floor
 
+from odb_shared.time_helpers import pretty_duration
+
 register = Library()
 
 @register.filter
@@ -13,28 +15,39 @@ def time_from_minutes(total_minutes):
 time_from_minutes.is_safe=True
 
 @register.filter
-def time_from_seconds(total_seconds):
+def time_from_seconds(total_seconds, show_seconds=False):
     if total_seconds is None or type(total_seconds) not in (int, long, float):
         return ""
+    timedata = pretty_duration(total_seconds)
 
-    hours, remainder = divmod(total_seconds, 3600)
-    hours = int(hours)
-    minutes = int(floor(remainder // 60))
-    seconds = int(round(remainder - (minutes * 60)))
+    days = timedata['days']
+    hours = timedata['hours']
+    minutes = timedata['minutes']
+    seconds = timedata['seconds']
 
-    timedata = {
-        'hours':hours,
-        'minutes':minutes,
-        'seconds':seconds
-    }
-
-    if minutes == 0:
-        return mark_safe(_("%(seconds)ss") % timedata)
-    elif hours == 0:
-        return mark_safe(_("%(minutes)sm %(seconds)ss") % timedata)
-    elif seconds == 0:
-        return mark_safe(_("%(hours)sh %(minutes)sm") % timedata)
+    if not show_seconds:
+        if days > 0:
+            if hours==0 and minutes==0:
+                return mark_safe(_("%(days)sd") % timedata)
+            else:
+                return mark_safe(_("%(days)sd %(hours)sh %(minutes)sm") % timedata)
+        elif hours>0:
+            if minutes==0:
+                return mark_safe(_("%(hours)sh") % timedata)
+            else:
+                return mark_safe(_("%(hours)sh %(minutes)sm") % timedata)
+        elif minutes>1:
+            return mark_safe(_("%(minutes)sm") % timedata)
+        else:
+            return mark_safe(_("%(seconds)ss") % timedata)
     else:
-        return mark_safe(_("%(hours)sh %(minutes)sm %(seconds)ss") % timedata)
+        if days > 0:
+            return mark_safe(_("%(days)sd %(hours)sh %(minutes)sm %(seconds)ss") % timedata)
+        elif hours>0:
+            return mark_safe(_("%(hours)sh %(minutes)sm %(seconds)ss") % timedata)
+        elif minutes>1:
+            return mark_safe(_("%(minutes)sm %(seconds)ss") % timedata)
+        else:
+            return mark_safe(_("%(seconds)ss") % timedata)
 
 time_from_seconds.is_safe=True

@@ -1,10 +1,13 @@
 from datetime import timedelta
 import datetime
+
+import math
 import re
 import calendar
 import pytz
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import ugettext
 
 DATE_FORMAT = '%Y-%m-%d'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
@@ -335,3 +338,20 @@ def round_off(date_obj, round_to = 15):
                              seconds=date_obj.second,
                              microseconds=date_obj.microsecond)
     return date_obj
+
+def pretty_duration(sec, signed=False):
+    is_negative = sec<0
+    sec = math.fabs(sec)
+
+    minutes, seconds = divmod(sec, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+
+    days, hours, minutes, seconds = [int(d) for d in [days, hours, minutes, seconds]]
+    sign = signed and (is_negative and "-" or "+") or ""
+    if days > 0:
+        return ugettext(u"%s%sd %sh %sm") % (sign, days, hours, minutes)
+    elif hours<1:
+        return ugettext(u"%s%sm") % (sign, minutes,)
+
+    return ugettext(u"%s%sh %sm") % (sign, hours, minutes)

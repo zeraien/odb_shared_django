@@ -47,7 +47,7 @@ msgid "%(days)sd"
 msgstr "%(days)sd"
 
 #, python-format
-msgid "%(days)sd %(hours)sh %(minutes)sm"
+msgid "%(days)sd %(hours)sh %(minutes)smin"
 msgstr "%(days)sd %(hours)stim %(minutes)smin"
 
 #, python-format
@@ -55,11 +55,11 @@ msgid "%(hours)sh"
 msgstr "%(hours)stim"
 
 #, python-format
-msgid "%(hours)sh %(minutes)sm"
+msgid "%(hours)sh %(minutes)smin"
 msgstr "%(hours)stim %(minutes)smin"
 
 #, python-format
-msgid "%(minutes)sm"
+msgid "%(minutes)smin"
 msgstr "%(minutes)smin"
 
 #, python-format
@@ -67,13 +67,13 @@ msgid "%(seconds)ss"
 msgstr "%(seconds)s sek"
 
 #, python-format
-msgid "%(days)sd %(hours)sh %(minutes)sm %(seconds)ss"
+msgid "%(days)sd %(hours)sh %(minutes)smin %(seconds)ss"
 msgstr "%(days)sd %(hours)stim %(minutes)smin %(seconds)ssek"
 
 #, python-format
-msgid "%(hours)sh %(minutes)sm %(seconds)ss"
+msgid "%(hours)sh %(minutes)smin %(seconds)ss"
 msgstr "%(hours)stim %(minutes)smin %(seconds)ssek"
 
 #, python-format
-msgid "%(minutes)sm %(seconds)ss"
+msgid "%(minutes)smin %(seconds)ss"
 msgstr "%(minutes)smin %(seconds)ssek"

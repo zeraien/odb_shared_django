@@ -35,7 +35,7 @@ class Monitor(ContextDecorator):
      monitor was initially locked. This is useful if you do not want to repeat a long running
      operation that just completed.
 
-     If passing `skip_if_already_locked`, the monitor will raise `LockfileExistsException` if
+     If passing `raise_if_already_locked`, the monitor will raise `LockfileExistsException` if
      the lockfile already exists when this monitor is poked.
     """
     def __init__(self, name, data, timeout=60, raise_if_already_locked=False):

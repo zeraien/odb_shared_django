@@ -11,9 +11,10 @@ from odb_shared import get_logger
 class VersionedModel(models.Model):
     class Meta:
         abstract = True
-    version = models.SmallIntegerField(_('version'), editable=True, default=0)
+    local_version = models.SmallIntegerField(_('version'), editable=True, default=0)
+
 def versioned_model_pre_save(instance,*args,**kwargs):
-    instance.version+=1
+    instance.local_version+=1
 
 
 def simpleTitleComponent(field_name="title"):

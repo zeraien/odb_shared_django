@@ -284,14 +284,14 @@ def get_midnight(dt_obj, add_days = 0):
     midnight = timezone.datetime(dt_obj.year, dt_obj.month, dt_obj.day)+timedelta(days=add_days)
     return tz.localize(midnight)
 
-def get_working_hours_in_month(year, month, work_hours_per_day=8):
-    dates = []
+def get_working_hours_in_month(year, month, until_date=None, work_hours_per_day=8):
     hours = 0
     for monthday, weekday in calendar.Calendar(0).itermonthdays2(year=year, month=month):
         if monthday==0 or weekday in (5,6):
             continue
         this_date = datetime.date(year=year, month=month, day=monthday)
-        dates.append(this_date)
+        if until_date and this_date>=until_date:
+            break
         hours += work_hours_per_day
     return hours
 

@@ -141,6 +141,7 @@ def get_time_ranges(start_date, end_date, epoch=True):
 def to_epoch(dt, return_none=False):
     """Return the number of seconds since the epoch in UTC. Accepts strings in an the following datetime format (YYYY-MM-DD HH:MM) or a datetime object.
         @param dt  Datetime object or string
+        :param return_none:  if `dt` is invalid, return None if this is true, otherwise return 0
     """
     if dt is None:
         if return_none:
@@ -239,7 +240,7 @@ def get_gap_ranges_from_dates(dates, start_date, end_date, max_days_per_range=30
     given a list of dates, the gaps are returned as an array of date ranges.
     The ranges are never longer than `max_days_per_range`.
 
-    date ranges are given in an inclusive way, meaning including the first date, and up to and including the last date
+    date ranges are given in an exclusive way, meaning including the first date, and excluding the last date
 
     the date ranges are themselves arrays [[start_date, end_date], ....]
     """
@@ -247,24 +248,26 @@ def get_gap_ranges_from_dates(dates, start_date, end_date, max_days_per_range=30
     start_date = to_date_object(start_date)
     end_date = to_date_object(end_date)
     corrected_start_date = start_date-one_day
-    dates = [corrected_start_date, end_date+one_day] + list(dates)
+    dates = [corrected_start_date, end_date] + list(dates)
     dates = sorted(set(dates))
 
     ranges = []
 
     dates = dates[dates.index(corrected_start_date):]
     previous_date = dates[0]
-    for date in dates[1:]:
+    for current_date in dates[1:]:
 
-        date_diff = date - previous_date
+        date_diff = current_date - previous_date
 
         if date_diff.days > 1:
-            current_range = [previous_date+one_day, date-one_day]
-            split_ranges = date_range_chunks(current_range[0], current_range[1], chunk_size=max_days_per_range)
+            current_range = [previous_date+one_day, current_date]
+            split_ranges = date_range_chunks(current_range[0],
+                                             current_range[1],
+                                             chunk_size=max_days_per_range,
+                                             last_date_excluded=True)
             ranges += split_ranges
-            # ranges.append(current_range)
 
-        previous_date = date
+        previous_date = current_date
 
     return ranges
 
@@ -280,6 +283,17 @@ def get_midnight(dt_obj, add_days = 0):
     tz = timezone.get_current_timezone()
     midnight = timezone.datetime(dt_obj.year, dt_obj.month, dt_obj.day)+timedelta(days=add_days)
     return tz.localize(midnight)
+
+def get_working_hours_in_month(year, month, work_hours_per_day=8):
+    dates = []
+    hours = 0
+    for monthday, weekday in calendar.Calendar(0).itermonthdays2(year=year, month=month):
+        if monthday==0 or weekday in (5,6):
+            continue
+        this_date = datetime.date(year=year, month=month, day=monthday)
+        dates.append(this_date)
+        hours += work_hours_per_day
+    return hours
 
 def convert_to_pst(date):
     pst = pytz.timezone("US/Pacific")

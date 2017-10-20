@@ -2,6 +2,8 @@ from datetime import timedelta
 import datetime
 
 import math
+from operator import itemgetter
+
 import re
 import calendar
 import pytz
@@ -89,8 +91,8 @@ def tz_fix_utc_epoch(utc_epoch, timezone):
 def fb_request_timestamp_to_date(dt_object):
     """Convert a datetime object into a facebook stats request date object
 
-    :param dt_object: datetime object
-    :return: dictionary
+    :param datetime.datetime dt_object: datetime object
+    :return: dict
     """
     if dt_object.year == 1970:
         return None
@@ -99,29 +101,62 @@ def fb_request_timestamp_to_date(dt_object):
         "day"  :dt_object.day,
         "year" :dt_object.year
     }
+
+def get_month_list(start_date, end_date):
+    """
+    Return sorted year+month for all dates in the range.
+
+    :param datetime.date start_date:
+    :param datetime.date end_date:
+    :return: a list of unique year,month tuples for all dates in the range.
+    """
+    year_months = set()
+    if start_date==end_date:
+        end_date+=datetime.timedelta(days=1)
+    for d in daterange(start_date, end_date):
+        year_months.add((d.year, d.month))
+    return sorted(list(year_months), key=itemgetter(1))
+
 def date_range(start_date, end_date, epoch=True):
+    """
+    see `daterange`
+    """
+    return daterange(start_date=start_date, end_date=end_date, epoch=epoch)
+
+def daterange(start_date, end_date, epoch=False):
+    """
+    returns a generator that lists all dates starting with `start_date` up to and including `end_date`,
+    if `start_date` is newer than `end_date`, the dates are returned in reverse order.
+
+    The date most in the future is never included in the resulting list - the list is end exclusive.
+
+    :param bool epoch: return in unix timestamp at midnight UTC
+    :param datetime.date start_date: starting from...
+    :param datetime.date end_date: up to and including...
+    :return: generator that iterates dates
+    """
     if end_date<start_date:
         days = (start_date-end_date).days
         multiplier = -1
+        r = range(1,days+1)
     else:
-        multiplier = 1
         days = (end_date-start_date).days
+        multiplier = 1
+        r = range(0,days)
 
-    ranges = []
-    for add_days in range(0,days+1):
-        ranges.append(
-            start_date+timedelta(days=add_days*multiplier)
-        )
-    return ranges
-
+    for n in r:
+        v = start_date + timedelta(days=n*multiplier)
+        if epoch:
+            v = to_epoch(get_midnight(v))
+        yield v
 
 def get_time_ranges(start_date, end_date, epoch=True):
     """
     Return {'time_start' : DATE, 'time_stop' : DATE}, {'time_start' : DATE+1, 'time_stop' : DATE+1}   ... etc
 
-    :param start_date:
-    :param end_date:
-    :param epoch: dates become epoch seconds if true, otherwise date objects
+    :param datetime.date start_date:
+    :param datetime.date end_date:
+    :param bool epoch: dates become epoch seconds if true, otherwise date objects
     :return:
     """
     if end_date<start_date:
@@ -140,8 +175,10 @@ def get_time_ranges(start_date, end_date, epoch=True):
 
 def to_epoch(dt, return_none=False):
     """Return the number of seconds since the epoch in UTC. Accepts strings in an the following datetime format (YYYY-MM-DD HH:MM) or a datetime object.
-        @param dt  Datetime object or string
+
+        :param datetime.datetime dt: Datetime object or string
         :param return_none:  if `dt` is invalid, return None if this is true, otherwise return 0
+        :return: the epoch seconds as an `int`
     """
     if dt is None:
         if return_none:
@@ -166,8 +203,13 @@ def parse_fb_timestamp(timestamp):
         raise ValueError("Invalid facebook timestamp [%s]" % timestamp)
 
 def from_epoch(epo):
-    """Because facebook insists on sending dates and times in a different format in the graph API, we are forced to
-    parse this as well"""
+    """
+    Because facebook insists on sending dates and times in a different format in the graph API, we are forced to
+    parse this as well
+    :param int epo: epoc seconds to turn into a `datetime.datetime` object
+    :type epo: int
+    :return: Datetime object
+    """
     if epo is None:
         return timezone.make_aware(timezone.datetime(1970,1,1), timezone.utc)
 
@@ -179,11 +221,6 @@ def chunks(l, chunk_size):
     """
     for i in xrange(0, len(l), chunk_size):
         yield l[i:i+chunk_size]
-
-def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)):
-        yield start_date + timedelta(n)
-
 
 def get_date_ranges_excluding_gaps(dates, max_days_per_range=30):
     """

@@ -1,4 +1,5 @@
-from time_helpers import get_gap_ranges_from_dates, date_range_chunks, get_time_ranges, get_date_ranges_excluding_gaps
+from time_helpers import get_gap_ranges_from_dates, date_range_chunks, get_time_ranges, get_date_ranges_excluding_gaps, \
+    daterange, get_month_list
 from django.test import TestCase
 from datetime import date, timedelta, datetime
 
@@ -284,3 +285,46 @@ class TestGetRangesExcludingGaps(TestCase):
 
         result = get_date_ranges_excluding_gaps(dates=dateList)
         self.assertListEqual(expectedResult, result)
+
+    def test_get_month_list(self):
+
+        d1 = date(2017,7,10)
+        d2 = date(2017,10,7)
+        l = get_month_list(start_date=d1, end_date=d2)
+        expected = [(2017,7),(2017,8),(2017,9),(2017,10)]
+        self.assertListEqual(l, expected)
+    def test_get_month_list_one_day(self):
+
+        d1 = date(2017,7,9)
+        d2 = date(2017,7,10)
+        l = get_month_list(start_date=d1, end_date=d2)
+        expected = [(2017,7),]
+        self.assertListEqual(l, expected)
+    def test_get_month_list_zero_days(self):
+
+        d1 = date(2017,7,10)
+        d2 = date(2017,7,10)
+        l = get_month_list(start_date=d1, end_date=d2)
+        expected = [(2017,7),]
+        self.assertListEqual(l, expected)
+
+    def test_daterange_positive(self):
+        d1 = date(2017,10,10)
+        d2 = date(2017,10,7)
+        l = list(daterange(start_date=d1, end_date=d2))
+        expected = [
+            date(2017,10,9),
+            date(2017,10,8),
+            date(2017,10,7),
+        ]
+        self.assertListEqual(l, expected)
+    def test_daterange_negative(self):
+        d1 = date(2017,10,7)
+        d2 = date(2017,10,10)
+        l = list(daterange(start_date=d1, end_date=d2))
+        expected = [
+            date(2017,10,7),
+            date(2017,10,8),
+            date(2017,10,9),
+        ]
+        self.assertListEqual(l, expected)

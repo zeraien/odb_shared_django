@@ -29,6 +29,8 @@ def time_from_seconds(total_seconds, show_seconds=False):
         if days > 0:
             if hours==0 and minutes==0:
                 return mark_safe(_("%(days)sd") % timedata)
+            elif minutes==0:
+                return mark_safe(_("%(days)sd %(hours)sh") % timedata)
             else:
                 return mark_safe(_("%(days)sd %(hours)sh %(minutes)smin") % timedata)
         elif hours>0:

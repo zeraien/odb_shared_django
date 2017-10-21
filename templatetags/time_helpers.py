@@ -40,8 +40,10 @@ def time_from_seconds(total_seconds, show_seconds=False):
                 return mark_safe(_("%(hours)sh %(minutes)smin") % timedata)
         elif minutes>1:
             return mark_safe(_("%(minutes)smin") % timedata)
-        else:
+        elif seconds>0:
             return mark_safe(_("%(seconds)ss") % timedata)
+        else:
+            return mark_safe("0")
     else:
         if days > 0:
             return mark_safe(_("%(days)sd %(hours)sh %(minutes)smin %(seconds)ss") % timedata)
@@ -49,7 +51,9 @@ def time_from_seconds(total_seconds, show_seconds=False):
             return mark_safe(_("%(hours)sh %(minutes)smin %(seconds)ss") % timedata)
         elif minutes>1:
             return mark_safe(_("%(minutes)smin %(seconds)ss") % timedata)
-        else:
+        elif seconds>0:
             return mark_safe(_("%(seconds)ss") % timedata)
+        else:
+            return mark_safe("0")
 
 time_from_seconds.is_safe=True

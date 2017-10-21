@@ -115,7 +115,7 @@ def get_month_list(start_date, end_date):
         end_date+=datetime.timedelta(days=1)
     for d in daterange(start_date, end_date):
         year_months.add((d.year, d.month))
-    return sorted(list(year_months), key=itemgetter(1))
+    return sorted(list(year_months))
 
 def date_range(start_date, end_date, epoch=True):
     """

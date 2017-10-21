@@ -123,7 +123,7 @@ def date_range(start_date, end_date, epoch=True):
     """
     return daterange(start_date=start_date, end_date=end_date, epoch=epoch)
 
-def daterange(start_date, end_date, epoch=False):
+def daterange(start_date, end_date, epoch=False, skip_func=None):
     """
     returns a generator that lists all dates starting with `start_date` up to and including `end_date`,
     if `start_date` is newer than `end_date`, the dates are returned in reverse order.
@@ -133,6 +133,7 @@ def daterange(start_date, end_date, epoch=False):
     :param bool epoch: return in unix timestamp at midnight UTC
     :param datetime.date start_date: starting from...
     :param datetime.date end_date: up to and including...
+    :param func skip_func: a function that takes a date in the range and returns True or False, if False, do not include the given date.
     :return: generator that iterates dates
     """
     if end_date<start_date:
@@ -146,9 +147,14 @@ def daterange(start_date, end_date, epoch=False):
 
     for n in r:
         v = start_date + timedelta(days=n*multiplier)
-        if epoch:
-            v = to_epoch(get_midnight(v))
-        yield v
+        skip = False
+        if skip_func:
+            skip = skip_func(v)
+
+        if not skip:
+            if epoch:
+                v = to_epoch(get_midnight(v))
+            yield v
 
 def get_time_ranges(start_date, end_date, epoch=True):
     """

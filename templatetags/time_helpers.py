@@ -3,7 +3,7 @@ from django.utils.translation import ugettext as _
 from django.template import Library
 from math import ceil, floor
 
-from odb_shared.time_helpers import pretty_duration
+from odb_shared.time_helpers import pretty_duration, to_epoch, from_epoch
 
 register = Library()
 
@@ -57,3 +57,12 @@ def time_from_seconds(total_seconds, show_seconds=False):
             return mark_safe("0")
 
 time_from_seconds.is_safe=True
+
+
+@register.filter(name="from_epoch")
+def from_epoch_filter(dt):
+    return from_epoch(dt)
+
+@register.filter(name="to_epoch")
+def to_epoch_filter(dt):
+    return to_epoch(dt)

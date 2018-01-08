@@ -12,7 +12,7 @@ def get_logger(extra_funnel=None):
     return logging.getLogger(funnel)
 
 def reraise(exception, info=None):
-    raise exception, None, sys.exc_info()[-1]
+    raise exception(info).with_traceback(sys.exc_info()[-1])
 
 def group_by_key(iterable, keyfunc):
     grouped =  OrderedDict()

@@ -1,7 +1,7 @@
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.template import Library
-from math import ceil, floor
+from numbers import Number
 
 from odb_shared.time_helpers import pretty_duration, to_epoch, from_epoch
 
@@ -9,14 +9,14 @@ register = Library()
 
 @register.filter
 def time_from_minutes(total_minutes):
-    if total_minutes is None or type(total_minutes) not in (int, long, float):
+    if total_minutes is None or not isinstance(total_minutes, Number):
         total_minutes = 0
     return time_from_seconds(total_minutes*60.)
 time_from_minutes.is_safe=True
 
 @register.filter
 def time_from_seconds(total_seconds, show_seconds=False):
-    if total_seconds is None or type(total_seconds) not in (int, long, float):
+    if total_seconds is None or not isinstance(total_seconds, Number):
         return ""
     timedata = pretty_duration(total_seconds)
 

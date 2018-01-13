@@ -1,3 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
+from builtins import str
 import json
 from django.core import exceptions as django_exceptions
 from django.db import models
@@ -66,7 +70,7 @@ class JSONFieldBase(models.Field):
         return self.to_python(value=value)
 
     def to_python(self, value):
-        is_str = type(value) in (str, unicode)
+        is_str = isinstance(value, basestring)
         if is_str and value.startswith(JSONFieldBase.prefix):
             value = value[len(JSONFieldBase.prefix):]
             try:
@@ -102,11 +106,7 @@ class JSONField(JSONFieldBase):
         return 'CharField'
 
 # http://djangosnippets.org/snippets/513/
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 class PickledObject(str):
     """A subclass of string so it can be told whether a string is

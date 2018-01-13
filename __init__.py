@@ -1,3 +1,6 @@
+from past.builtins import cmp
+from builtins import str
+from builtins import range
 from collections import OrderedDict
 
 __author__ = 'zeraien'
@@ -6,7 +9,7 @@ import logging
 import sys
 
 def get_logger(extra_funnel=None):
-    funnel = 'ingager_results'
+    funnel = 'odb_shared'
     if extra_funnel:
         funnel = '.'.join((funnel,extra_funnel))
     return logging.getLogger(funnel)
@@ -32,14 +35,14 @@ def slice_generator(items, group_size):
         out = []
         try:
             for i in range(0, group_size):
-                out.append(items_iter.next())
+                out.append(next(items_iter))
         finally:
             if out:
                 yield out
 
 def dict_from_list(the_list, key):
     the_dict = {}
-    key = unicode(key)
+    key = str(key)
 
     for item in the_list:
         is_dict = type(item) is dict

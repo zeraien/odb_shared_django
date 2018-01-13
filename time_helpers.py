@@ -1,3 +1,4 @@
+from builtins import range
 from datetime import timedelta
 import datetime
 
@@ -139,11 +140,11 @@ def daterange(start_date, end_date, epoch=False, skip_func=None):
     if end_date<start_date:
         days = (start_date-end_date).days
         multiplier = -1
-        r = range(1,days+1)
+        r = list(range(1,days+1))
     else:
         days = (end_date-start_date).days
         multiplier = 1
-        r = range(0,days)
+        r = list(range(0,days))
 
     for n in r:
         v = start_date + timedelta(days=n*multiplier)
@@ -225,7 +226,7 @@ def from_epoch(epo):
 def chunks(l, chunk_size):
     """ Yield successive n-sized chunks from l.
     """
-    for i in xrange(0, len(l), chunk_size):
+    for i in range(0, len(l), chunk_size):
         yield l[i:i+chunk_size]
 
 def get_date_ranges_excluding_gaps(dates, max_days_per_range=30):
@@ -390,7 +391,7 @@ def round_off(date_obj, round_to = 15):
     :param round_to: Nearest number of minutes to round to. Default is 15.
     :return: The resulting datetime object.
     """
-    date_obj += timedelta(minutes= round_to/2)
+    date_obj += timedelta(minutes=int(round(round_to/2)))
     date_obj -= timedelta(minutes=date_obj.minute % round_to,
                              seconds=date_obj.second,
                              microseconds=date_obj.microsecond)

@@ -5,10 +5,13 @@ A simple lockfile class used for concurrent access restriction.
 A timeout can be given to make sure the lockfile expires.
 
 """
+from __future__ import unicode_literals
+from builtins import str
+from builtins import object
 import atexit
 
 from django.utils.decorators import ContextDecorator
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_text
 import os
 import time
 import datetime
@@ -46,7 +49,7 @@ class Monitor(ContextDecorator):
         self.running_time = 0
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
-        self.digest = hashlib.sha1(smart_str(data) + name).hexdigest() + '-' + smart_str(name)[0:32]
+        self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)[0:32]
         self.lockfile = Lockfile(self.digest)
 
 
@@ -91,7 +94,7 @@ class Lockfile(object):
     def exists(self):
         """Return True if the lockfile exists. Call this before creating the lockfile!"""
 
-        get_logger().debug("[%s] lockfile check" % (self.filename))
+        get_logger().debug("[%s] lockfile check" % self.filename)
 
         lock_file = self.filename
         if os.path.exists(lock_file):

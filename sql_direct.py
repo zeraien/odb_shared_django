@@ -8,7 +8,7 @@ def sql_update_with_key(table_name, primary_key, data_list):
     if not len(data_list):
         return
 
-    keys = data_list[0].keys()
+    keys = list(data_list[0].keys())
     _values_list = []
     for row in data_list:
         _values_list.append(tuple([row[k] for k in keys] + [row[primary_key]]))
@@ -29,7 +29,7 @@ def sql_insert(table_name, data_list):
     if not len(data_list):
         return
 
-    keys = data_list[0].keys()
+    keys = list(data_list[0].keys())
     _values_list = []
     _values_count = len(keys)
     for row in data_list:

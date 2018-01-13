@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from django.utils.encoding import smart_unicode
+from builtins import object
 
-class Flash:
+class Flash(object):
     def __init__(self, message, is_error=False):
         self.message = message.encode('utf8')
         self.is_error = is_error
@@ -30,7 +30,7 @@ class FlashWrapper(object):
     def __len__(self):
         return len(self.request.session.get('flash_data', []))
 
-    def __nonzero__(self):
+    def __bool__(self):
         return len(self) > 0
 
     def has_only_errors(self):

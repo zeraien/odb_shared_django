@@ -47,8 +47,8 @@ def redirect(view_func):
 
 def render_json(view_func):
     @wraps(view_func, assigned=available_attrs(view_func))
-    def wrapper(request, *args, **kw):
-        _json = view_func(request, *args, **kw)
+    def wrapper(request, *args, **kwargs):
+        _json = view_func(request, *args, **kwargs)
         if not isinstance(_json, str) and not isinstance(_json, dict) and not isinstance(_json, list) and not isinstance(_json, tuple):
             return _json
         return HttpResponse(json.dumps(_json), content_type="application/json")

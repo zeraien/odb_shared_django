@@ -1,6 +1,7 @@
 from past.builtins import cmp
 from builtins import str
 from builtins import range
+from future.utils import raise_with_traceback
 from collections import OrderedDict
 
 __author__ = 'zeraien'
@@ -14,8 +15,8 @@ def get_logger(extra_funnel=None):
         funnel = '.'.join((funnel,extra_funnel))
     return logging.getLogger(funnel)
 
-def reraise(exception, info=None):
-    raise exception(info).with_traceback(sys.exc_info()[-1])
+def reraise(exception):
+    raise_with_traceback(exception)
 
 def group_by_key(iterable, keyfunc):
     grouped =  OrderedDict()

@@ -1,3 +1,4 @@
+from django.utils.six import python_2_unicode_compatible
 from future import standard_library
 standard_library.install_aliases()
 from past.builtins import basestring
@@ -22,10 +23,12 @@ def versioned_model_pre_save(instance,*args,**kwargs):
 
 
 def simpleTitleComponent(field_name="title"):
+
+    @python_2_unicode_compatible
     class C(models.Model):
         class Meta:
             abstract = True
-        def __unicode__(self):
+        def __str__(self):
             return getattr(self, field_name)
     return C
 

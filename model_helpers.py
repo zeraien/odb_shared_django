@@ -154,10 +154,6 @@ class PickledObjectField(models.Field):
             raise TypeError('Lookup type %s is not supported.' % lookup_type)
 
 class MoneyField(models.DecimalField):
-    empty_strings_allowed = False
-    default_error_messages = {
-        'invalid': _("This value must be an integer."),
-    }
     description = _("Money")
 
     def __init__(self, *args, **kwargs):
@@ -166,19 +162,6 @@ class MoneyField(models.DecimalField):
             max_digits=14,
             decimal_places=2)
         super(MoneyField, self).__init__(*args, **kwargs)
-
-    def from_db_value(self, value, expression, connection, context):
-        return self.to_python(value=value)
-
-    def to_python(self, value):
-        if value is None:
-            return value
-        return float(value)
-
-    def formfield(self, **kwargs):
-        defaults = {'form_class': forms.DecimalField}
-        defaults.update(kwargs)
-        return super(MoneyField, self).formfield(**defaults)
 
 class DefaultModelManager(models.QuerySet):
     def visible(self, **kwargs):

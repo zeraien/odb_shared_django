@@ -58,6 +58,16 @@ def time_from_seconds(total_seconds, show_seconds=False):
 
 time_from_seconds.is_safe=True
 
+@register.filter(name="from_java_epoch")
+def from_java_epoch_filter(dt):
+    try:
+        return from_epoch(dt/1000.)
+    except TypeError:
+        return dt
+
+@register.filter(name="to_java_epoch")
+def to_java_epoch_filter(dt):
+    return to_epoch(dt)*1000
 
 @register.filter(name="from_epoch")
 def from_epoch_filter(dt):

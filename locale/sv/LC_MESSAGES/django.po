@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-21 05:47+0200\n"
+"POT-Creation-Date: 2018-09-14 16:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,9 +29,6 @@ msgstr "Detta värde måste innehålla giltig JSON"
 
 msgid "A JSON Object"
 msgstr "Ett JSONobjekt"
-
-msgid "This value must be an integer."
-msgstr "Detta värde måste vara ett heltal."
 
 msgid "Money"
 msgstr "Pengar"
@@ -81,3 +78,6 @@ msgstr "%(hours)stim %(minutes)smin %(seconds)ssek"
 #, python-format
 msgid "%(minutes)smin %(seconds)ss"
 msgstr "%(minutes)smin %(seconds)ssek"
+
+#~ msgid "This value must be an integer."
+#~ msgstr "Detta värde måste vara ett heltal."

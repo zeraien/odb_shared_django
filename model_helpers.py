@@ -3,7 +3,7 @@ from future import standard_library
 standard_library.install_aliases()
 from past.builtins import basestring
 from builtins import str
-import json
+import simplejson as json
 from django.core import exceptions as django_exceptions
 from django.db import models
 from django.utils import timezone

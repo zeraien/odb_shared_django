@@ -1,6 +1,6 @@
 from past.builtins import basestring
 import os.path
-import json
+import simplejson as json
 
 from django.shortcuts import render as django_render
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect

@@ -14,6 +14,7 @@ from django.utils.translation import ugettext
 
 DATE_FORMAT = '%Y-%m-%d'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M'
+TIME_FORMAT = '%H:%M'
 FB_DATETIME_FORMAT  = '%Y-%m-%dT%H:%M:%S+0000'
 
 def get_list_of_monday_thru_friday_dates(starting_date=None, include_weekend=False):

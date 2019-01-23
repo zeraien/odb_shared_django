@@ -49,7 +49,7 @@ class Monitor(ContextDecorator):
         self.running_time = 0
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
-        self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)[0:32]
+        self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)
         self.lockfile = Lockfile(self.digest)
 
 
@@ -57,14 +57,16 @@ class Monitor(ContextDecorator):
 
         get_logger().debug("[%s] Monitor [%s] check starting..." % (self.digest, self.name))
 
-        was_locked_initially = self.lockfile.exists()
+        was_locked_initially = lockfile_exists = self.lockfile.exists()
 
         if was_locked_initially and self.raise_if_already_locked:
+            get_logger().debug("[%s] lockfile found" % self.digest)
             raise LockfileExistsException("%s already locked, bailing out."% self.digest)
 
-        while self.lockfile.exists() and (self.timeout > 0 and self.running_time <= self.timeout):
+        while lockfile_exists and (self.timeout > 0 and self.running_time <= self.timeout):
             self.running_time += 1
             time.sleep(1)
+            lockfile_exists = self.lockfile.exists()
 
         self.lockfile.create()
         get_logger().debug("[%s] Monitor [%s] is green!" % (self.digest, self.name))
@@ -168,15 +170,16 @@ def lockfile_wait(name, raise_if_already_locked=True, timeout=60):
     # `name_or_func`, it's actually the function being decorated.
     name_or_func = name
     if callable(name_or_func):
-        return Monitor(name=".".join((name_or_func.__module__,name_or_func.__name__)),
+        data = [name_or_func.__module__,name_or_func.__name__]
+        return Monitor(name=".".join(data),
                        raise_if_already_locked=raise_if_already_locked,
-                       data=[],
+                       data=data,
                        timeout=timeout)(name_or_func)
     # Decorator: @lockfile_wait(...) or context manager: with lockfile_wait(...): ...
     else:
         return Monitor(name=name_or_func,
                        raise_if_already_locked=raise_if_already_locked,
-                       data=[],
+                       data=[name_or_func],
                        timeout=timeout)
 
 lockfiles = {}

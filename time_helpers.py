@@ -196,6 +196,8 @@ def to_epoch(dt, return_none=False):
 
     if isinstance(dt, datetime.date):
         return int(calendar.timegm(dt.timetuple()))
+    elif isinstance(dt, int):
+        return dt
     elif not isinstance(dt, datetime.datetime):
         try:
             dt = datetime.datetime.strptime(dt, DATETIME_FORMAT)

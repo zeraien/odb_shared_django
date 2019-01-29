@@ -10,7 +10,7 @@ import logging
 import sys
 
 def get_logger(extra_funnel=None):
-    funnel = 'odb_shared'
+    funnel = 'odb'
     if extra_funnel:
         funnel = '.'.join((funnel,extra_funnel))
     return logging.getLogger(funnel)

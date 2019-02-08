@@ -56,7 +56,8 @@ def sql_insert(table_name, data_list):
     try:
         for v in _values_list:
             cursor.execute(query, v)
-    except TypeError, e:
+            yield cursor.lastrowid
+    except TypeError as e:
         import pprint
         mail_admins(subject="WTF", message="""
         Query: %s\n\n

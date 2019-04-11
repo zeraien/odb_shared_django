@@ -1,7 +1,10 @@
+import logging
 import time
-
+import functools
 from django.conf import settings
+from django.utils.decorators import available_attrs
 
+logger = logging.getLogger("odb.profiler")
 
 class Profile(object):
     def __init__(self, title):
@@ -14,6 +17,12 @@ class Profile(object):
     def __exit__(self, type, value, traceback):
         if settings.DEBUG and settings.PROFILE_PRINT_ENABLED:
             self.time_end = time.time()
-            print(self.title, round(self.time_end-self.time_start, 4))
+            logger.debug("#### BASIC PROFILER #### %s - %s" % (self.title, "%ss" % round(self.time_end-self.time_start, 4)))
 
 
+def profiler(func):
+    @functools.wraps(func, assigned=available_attrs(func))
+    def call(*args, **kwargs):
+        with Profile(func.__name__):
+            return func(*args, **kwargs)
+    return call

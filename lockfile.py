@@ -13,6 +13,7 @@ import atexit
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import smart_text
 import os
+import stat
 import time
 import datetime
 import tempfile
@@ -50,7 +51,7 @@ class Monitor(ContextDecorator):
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
         self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)
-        self.lockfile = Lockfile(self.digest)
+        self.lockfile = Lockfile(self.digest, timeout=timeout)
 
 
     def __enter__(self):
@@ -122,7 +123,7 @@ class Lockfile(object):
                 delta = datetime.timedelta(seconds=self.timeout)
                 if _time + delta < datetime.datetime.now():
                     self.lock_time = datetime.datetime.fromtimestamp(0)
-                    os.unlink(lock_file)
+                    self.delete()
                     get_logger().debug("[%s] lockfile found, but timed out" % self.filename)
                     return False
                 else:
@@ -139,6 +140,7 @@ class Lockfile(object):
         self.lock_time = datetime.datetime.fromtimestamp(timestamp)
         f_ = open(self.filename, 'w')
         f_.write(str(timestamp))
+        os.chmod(self.filename, stat.S_IRUSR|stat.S_IWUSR|stat.S_IROTH|stat.S_IWOTH|stat.S_IWGRP|stat.S_IRGRP)
         f_.close()
 
         global lockfiles

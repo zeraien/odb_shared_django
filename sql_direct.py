@@ -26,6 +26,8 @@ def sql_update_with_key(table_name, primary_key, data_list):
     cursor.close()
 
 def sql_insert(table_name, data_list):
+    """OBS: Generator"""
+
     if not len(data_list):
         return
 

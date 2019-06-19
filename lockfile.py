@@ -56,13 +56,13 @@ class Monitor(ContextDecorator):
 
     def __enter__(self):
 
-        get_logger().debug("[%s] Monitor [%s] check starting..." % (self.digest, self.name))
+        get_logger().debug("Monitor [%s] check starting... [%s]" % (self.name, self.digest))
 
         was_locked_initially = lockfile_exists = self.lockfile.exists()
 
         if was_locked_initially and self.raise_if_already_locked:
-            get_logger().debug("[%s] lockfile found" % self.digest)
-            raise LockfileExistsException("%s already locked, bailing out."% self.digest)
+            get_logger().debug("Monitor [%s] lockfile found" % self.name)
+            raise LockfileExistsException("[%s] already locked with [%s], bailing out."% (self.name,self.lockfile))
 
         while lockfile_exists and (self.timeout > 0 and self.running_time <= self.timeout):
             self.running_time += 1
@@ -70,12 +70,12 @@ class Monitor(ContextDecorator):
             lockfile_exists = self.lockfile.exists()
 
         self.lockfile.create()
-        get_logger().debug("[%s] Monitor [%s] is green!" % (self.digest, self.name))
+        get_logger().debug("Monitor [%s] is green!" % (self.name, ))
 
         return was_locked_initially
 
     def __exit__(self, type, value, traceback):
-        get_logger().debug("[%s] Monitored [%s] activity is finished!" % (self.digest, self.name))
+        get_logger().debug("Monitor [%s] activity is finished!" % (self.name, ))
         self.lockfile.delete()
 
 
@@ -96,8 +96,6 @@ class Lockfile(object):
 
     def exists(self):
         """Return True if the lockfile exists. Call this before creating the lockfile!"""
-
-        get_logger().debug("[%s] lockfile check" % self.filename)
 
         lock_file = self.filename
 

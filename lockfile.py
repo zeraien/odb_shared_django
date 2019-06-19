@@ -21,7 +21,7 @@ import logging
 import random
 import hashlib
 from odb_shared import get_logger
-
+from django.core.cache import cache
 
 class LockfileExistsException(Exception): pass
 
@@ -47,11 +47,11 @@ class Monitor(ContextDecorator):
         if timeout is None: timeout = 0
 
         self.timeout = timeout
-        self.running_time = 0
+        self.running_time = 0.
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
         self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)
-        self.lockfile = Lockfile(self.digest, timeout=timeout)
+        self.lockfile = CacheLockfile(self.digest, timeout=timeout)
 
 
     def __enter__(self):
@@ -64,9 +64,11 @@ class Monitor(ContextDecorator):
             get_logger().debug("Monitor [%s] lockfile found" % self.name)
             raise LockfileExistsException("[%s] already locked with [%s], bailing out."% (self.name,self.lockfile))
 
+        interval = 0.5
+
         while lockfile_exists and (self.timeout > 0 and self.running_time <= self.timeout):
-            self.running_time += 1
-            time.sleep(1)
+            self.running_time += interval
+            time.sleep(interval)
             lockfile_exists = self.lockfile.exists()
 
         self.lockfile.create()
@@ -78,7 +80,27 @@ class Monitor(ContextDecorator):
         get_logger().debug("Monitor [%s] activity is finished!" % (self.name, ))
         self.lockfile.delete()
 
+class CacheLockfile(object):
+    def __init__(self, filename, timeout=None):
+        self.basename = filename
+        self.timeout = timeout
+        self.lock_time = datetime.datetime.fromtimestamp(0)
 
+    def exists(self):
+        sleep_sec = random.random() * .1
+        get_logger().debug("[%s] lockfile check starting in %ss" % (self.basename, sleep_sec))
+        time.sleep(sleep_sec)
+        return cache.get(self.basename) is not None
+    def create(self):
+        timestamp = time.time()
+        self.lock_time = datetime.datetime.fromtimestamp(timestamp)
+        cache.set(self.basename, str(timestamp), self.timeout)
+    def delete(self):
+        cache.delete(self.basename)
+    def get_lock_time(self):
+        return self.lock_time
+    def __repr__(self):
+        return self.basename
 
 class Lockfile(object):
     """A simple lockfile class with a timer, lockfile expires after the set timeout."""

@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.core.mail import mail_admins
 from django.db import connection
-from odb_shared import reraise
+from odb_shared import reraise, get_logger
 
 
 def sql_update_with_key(table_name, primary_key, data_list):
@@ -61,11 +60,7 @@ def sql_insert(table_name, data_list):
             cursor.execute(query, v)
             yield cursor.lastrowid
     except TypeError as e:
-        import pprint
-        mail_admins(subject="WTF", message="""
-        Query: %s\n\n
-        %s
-        """ % (query, pprint.pformat(_values_list)))
+        get_logger().exception("Error in SQL Query for table: %s" % table_name, exc_info=1)
         reraise(e)
     cursor.close()
 

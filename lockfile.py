@@ -25,6 +25,9 @@ from django.core.cache import cache
 
 class LockfileExistsException(Exception): pass
 
+logger = get_logger("lockfile")
+
+#todo rename to Semaphore, since that's what this is?
 class Monitor(ContextDecorator):
     """This class is used as such:
 
@@ -51,17 +54,19 @@ class Monitor(ContextDecorator):
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
         self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)
-        self.lockfile = CacheLockfile(self.digest, timeout=timeout)
+        self.lockfile = CacheLock(self.digest, timeout=timeout)
 
 
     def __enter__(self):
 
-        get_logger().debug("Monitor [%s] check starting... [%s]" % (self.name, self.digest))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Monitor [%s] check starting... [%s]" % (self.name, self.digest))
 
         was_locked_initially = lockfile_exists = self.lockfile.exists()
 
         if was_locked_initially and self.raise_if_already_locked:
-            get_logger().debug("Monitor [%s] lockfile found" % self.name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Monitor [%s] lockfile found" % self.name)
             raise LockfileExistsException("[%s] already locked with [%s], bailing out."% (self.name,self.lockfile))
 
         interval = 0.5
@@ -72,15 +77,17 @@ class Monitor(ContextDecorator):
             lockfile_exists = self.lockfile.exists()
 
         self.lockfile.create()
-        get_logger().debug("Monitor [%s] is green!" % (self.name, ))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Monitor [%s] is green!" % (self.name, ))
 
         return was_locked_initially
 
     def __exit__(self, type, value, traceback):
-        get_logger().debug("Monitor [%s] activity is finished!" % (self.name, ))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Monitor [%s] activity is finished!" % (self.name, ))
         self.lockfile.delete()
 
-class CacheLockfile(object):
+class CacheLock(object):
     def __init__(self, filename, timeout=None):
         self.basename = filename
         self.timeout = timeout
@@ -88,7 +95,8 @@ class CacheLockfile(object):
 
     def exists(self):
         sleep_sec = random.random() * .1
-        get_logger().debug("[%s] lockfile check starting in %ss" % (self.basename, sleep_sec))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("[%s] lockfile check starting in %ss" % (self.basename, sleep_sec))
         time.sleep(sleep_sec)
         return cache.get(self.basename) is not None
     def create(self):
@@ -122,7 +130,8 @@ class Lockfile(object):
         lock_file = self.filename
 
         sleep_sec = random.random() * .1
-        get_logger().debug("[%s] lockfile check starting in %ss" % (self.filename, sleep_sec))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("[%s] lockfile check starting in %ss" % (self.filename, sleep_sec))
         time.sleep(sleep_sec)
 
         if os.path.exists(lock_file):
@@ -144,12 +153,13 @@ class Lockfile(object):
                 if _time + delta < datetime.datetime.now():
                     self.lock_time = datetime.datetime.fromtimestamp(0)
                     self.delete()
-                    get_logger().debug("[%s] lockfile found, but timed out" % self.filename)
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug("[%s] lockfile found, but timed out" % self.filename)
                     return False
                 else:
                     return True
             except IOError:
-                get_logger().warning("Error reading or writing to lockfile %s" % self.filename, exc_info=True)
+                logger.warning("Error reading or writing to lockfile %s" % self.filename, exc_info=True)
 
                 return False
         return False
@@ -172,7 +182,7 @@ class Lockfile(object):
             try:
                 os.unlink(self.filename)
             except OSError as e:
-                get_logger().exception("Failed to delete lockfile - this should not be happening!")
+                logger.exception("Failed to delete lockfile - this should not be happening!")
             finally:
                 global lockfiles
                 if self.filename in lockfiles:

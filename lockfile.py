@@ -150,7 +150,7 @@ class Lockfile(object):
             try:
                 os.unlink(self.filename)
             except OSError as e:
-                get_logger().warning("Tried to delete lockfile %s, but failed with error: %s. This should not be happening!" % (self.filename, e))
+                get_logger().exception("Failed to delete lockfile - this should not be happening!")
             finally:
                 global lockfiles
                 if self.filename in lockfiles:

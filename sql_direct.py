@@ -31,11 +31,12 @@ def sql_insert(table_name, data_list):
     if not len(data_list):
         return
 
-    keys = list(data_list[0].keys())
+    original_keys = list(data_list[0].keys())
+    keys = ["`%s`"%k for k in original_keys]
     _values_list = []
     _values_count = len(keys)
     for row in data_list:
-        _values_list.append(tuple([row[k] for k in keys]))
+        _values_list.append(tuple([row[k] for k in original_keys]))
 
     sql_replacement = {
         'table_name': table_name,

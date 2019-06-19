@@ -100,12 +100,12 @@ class Lockfile(object):
         get_logger().debug("[%s] lockfile check" % self.filename)
 
         lock_file = self.filename
+
+        sleep_sec = random.random() * .1
+        get_logger().debug("[%s] lockfile check starting in %ss" % (self.filename, sleep_sec))
+        time.sleep(sleep_sec)
+
         if os.path.exists(lock_file):
-
-            sleep_sec = random.randint(25, 100) / 1000.
-            get_logger().debug("[%s] lockfile check starting in %ss" % (self.filename, sleep_sec))
-            time.sleep(sleep_sec)
-
             if self.timeout is None or self.timeout <= 0:
                 return True
 

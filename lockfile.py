@@ -45,7 +45,7 @@ class Monitor(ContextDecorator):
      If passing `raise_if_already_locked`, the monitor will raise `LockfileExistsException` if
      the lockfile already exists when this monitor is poked.
     """
-    def __init__(self, name, data, timeout=60, raise_if_already_locked=False):
+    def __init__(self, name, data, timeout=180, raise_if_already_locked=False):
 
         if timeout is None: timeout = 0
 

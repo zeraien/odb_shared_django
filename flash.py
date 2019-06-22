@@ -49,7 +49,7 @@ class FlashWrapper(object):
 
     def get_and_clear(self):
         flash_ = None
-        if exists(self.request) and self.request.session.has_key('flash_data'):
+        if exists(self.request) and 'flash_data' in self.request.session:
             flash_ = self.request.session['flash_data']
             clear(self.request)
         else: flash_ = []

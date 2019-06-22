@@ -5,7 +5,7 @@ A simple lockfile class used for concurrent access restriction.
 A timeout can be given to make sure the lockfile expires.
 
 """
-from __future__ import unicode_literals
+
 from builtins import str
 from builtins import object
 import atexit
@@ -217,7 +217,7 @@ def lockfile_wait(name, raise_if_already_locked=True, timeout=60):
 lockfiles = {}
 
 def cleanup():
-    for lockfile in lockfiles.values():
+    for lockfile in list(lockfiles.values()):
         lockfile.delete()
 
 atexit.register(cleanup)

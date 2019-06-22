@@ -1,8 +1,6 @@
 from django.utils.six import python_2_unicode_compatible
 from future import standard_library
 standard_library.install_aliases()
-from past.builtins import basestring
-from builtins import str
 import simplejson as json
 from django.core import exceptions as django_exceptions
 from django.db import models
@@ -73,7 +71,7 @@ class JSONFieldBase(models.Field):
         return self.to_python(value=value)
 
     def to_python(self, value):
-        is_str = isinstance(value, basestring)
+        is_str = isinstance(value, str)
         if is_str and value.startswith(JSONFieldBase.prefix):
             value = value[len(JSONFieldBase.prefix):]
             try:

@@ -10,7 +10,7 @@ def mklist(value):
     :return:
     """
     try:
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             f = iter(value)
             return value
     except TypeError:
@@ -28,7 +28,7 @@ def enumerate_params(params):
     :return: Does not return, it's a generator.
     """
     if type(params) is dict:
-        for key, value in params.items():
+        for key, value in list(params.items()):
             for v in mklist(value):
                 yield key, v
     else:

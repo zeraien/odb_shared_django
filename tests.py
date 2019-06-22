@@ -1,4 +1,4 @@
-from time_helpers import get_gap_ranges_from_dates, date_range_chunks, get_time_ranges, get_date_ranges_excluding_gaps, \
+from .time_helpers import get_gap_ranges_from_dates, date_range_chunks, get_time_ranges, get_date_ranges_excluding_gaps, \
     daterange, get_month_list
 from django.test import TestCase
 from datetime import date, timedelta, datetime

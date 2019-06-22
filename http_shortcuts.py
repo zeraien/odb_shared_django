@@ -1,4 +1,3 @@
-from past.builtins import basestring
 import os.path
 import simplejson as json
 
@@ -29,7 +28,7 @@ def permanent_redirect(view_func):
     @wraps(view_func, assigned=available_attrs(view_func))
     def wrapper(request, *args, **kw):
         to = view_func(request, *args, **kw)
-        if isinstance(to, basestring):
+        if isinstance(to, str):
             return HttpResponsePermanentRedirect(to)
         else:
             return to
@@ -39,7 +38,7 @@ def redirect(view_func):
     @wraps(view_func, assigned=available_attrs(view_func))
     def wrapper(request, *args, **kw):
         to = view_func(request, *args, **kw)
-        if isinstance(to, basestring):
+        if isinstance(to, str):
             return HttpResponseRedirect(to)
         else:
             return to

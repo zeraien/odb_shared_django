@@ -53,7 +53,7 @@ class Monitor(ContextDecorator):
         self.running_time = 0.
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
-        self.digest = hashlib.sha1(smart_text(data) + name).hexdigest() + '-' + smart_text(name)
+        self.digest = hashlib.sha1((smart_text(data) + name).encode("utf8")).hexdigest() + '-' + smart_text(name)
         self.lockfile = CacheLock(self.digest, timeout=timeout)
 
 

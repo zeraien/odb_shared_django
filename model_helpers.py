@@ -39,10 +39,11 @@ def do_text_markup(markup_language, content):
         content = textile.textile(content)
     return content
 
+@python_2_unicode_compatible
 class NamedTimeStampedModel(TimeStampedModel):
     class Meta:
         abstract = True
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     name = models.CharField(_('name'), max_length=255)
 
@@ -67,7 +68,7 @@ class JSONFieldBase(models.Field):
 
         return value
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return self.to_python(value=value)
 
     def to_python(self, value):
@@ -118,7 +119,7 @@ class PickledObject(str):
 
 class PickledObjectField(models.Field):
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return self.to_python(value=value)
 
     def to_python(self, value):

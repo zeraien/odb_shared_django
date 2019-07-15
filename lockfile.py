@@ -10,7 +10,12 @@ from builtins import str
 from builtins import object
 import atexit
 
-from django.utils.decorators import ContextDecorator
+try:
+    from contextlib import ContextDecorator
+except ImportError:
+    #python 2.7 and django<2 compat
+    from django.utils.decorators import ContextDecorator
+
 from django.utils.encoding import smart_text
 import os
 import stat

@@ -1,4 +1,4 @@
-{% load i18n %}{% load pretty_forms %}{% csrf_token %}
+{% load i18n %}{% load pretty_forms %}
 
 {% if form.errors or form.non_field_errors %}
     <div role="alert" class="alert alert-block fade in alert-danger">
@@ -21,7 +21,7 @@
 
 {% endif %}
 {% for widget in form.visible_fields %}
-    <div class="form-group{% if widget.errors %} has-error{% else %}{% if widget.form.is_bound %} has-success{% endif %}{% endif %}">
+    <div id="{{ widget.auto_id }}_form_group" class="form-group{% if widget.errors %} has-error{% else %}{% if widget.form.is_bound %} has-success{% endif %}{% endif %}">
         {% if widget|is_checkbox %}
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="checkbox">

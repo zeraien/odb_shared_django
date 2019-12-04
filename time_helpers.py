@@ -400,6 +400,13 @@ def round_off(date_obj, round_to = 15):
                              microseconds=date_obj.microsecond)
     return date_obj
 
+def add_date_to_time(date_, time_, tzinfo=None):
+    if None in (time_, date_):
+        return None
+    return datetime.datetime(year=date_.year, month=date_.month, day=date_.day,
+                             hour=time_.hour, minute=time_.minute,
+                             tzinfo=tzinfo)
+
 def pretty_duration(sec):
     is_negative = sec<0
     sec = math.fabs(sec)

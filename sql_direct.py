@@ -58,13 +58,14 @@ def sql_insert(table_name, data_list, single_query=False, update_if_exists=True)
         "values_placeholders": values_placeholders
     }
 
+    query = _sql_insert_command(on_duplicate_update=update_if_exists)
     if not update_if_exists or settings.DATABASES['default']['ENGINE'] == "django.db.backends.sqlite3":
-        query = _sql_insert_command() % sql_replacement
+        query = query % sql_replacement
     else:
         sql_replacement.update({
             'update_query': ', '.join(['%s=VALUES(%s)' % (k,k) for k in keys])
         })
-        query = _sql_insert_command() % sql_replacement
+        query = query % sql_replacement
         # for idx, v in enumerate(_values_list):
         #     _values_list[idx] = tuple(v + v)
     _values_list = list(set(_values_list))
@@ -82,9 +83,10 @@ def sql_insert(table_name, data_list, single_query=False, update_if_exists=True)
         reraise(e)
     cursor.close()
 
-def _sql_insert_command():
+def _sql_insert_command(on_duplicate_update=True):
 
-    if settings.DATABASES['default']['ENGINE'] == "django.db.backends.sqlite3":
+    if not on_duplicate_update or settings.DATABASES['default']['ENGINE'] == "django.db.backends.sqlite3":
         return "INSERT INTO %(table_name)s (%(column_names)s) VALUES %(values_placeholders)s"
     else:
         return "INSERT INTO %(table_name)s (%(column_names)s) VALUES %(values_placeholders)s ON DUPLICATE KEY UPDATE %(update_query)s"
+

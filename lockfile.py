@@ -16,7 +16,7 @@ except ImportError:
     #python 2.7 and django<2 compat
     from django.utils.decorators import ContextDecorator
 
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str as smart_text
 import os
 import stat
 import time

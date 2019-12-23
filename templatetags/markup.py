@@ -15,7 +15,7 @@ import warnings
 
 from django import template
 from django.conf import settings
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import smart_str as smart_text, force_str as force_text
 from django.utils.safestring import mark_safe
 
 register = template.Library()

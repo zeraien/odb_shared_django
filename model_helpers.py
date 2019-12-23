@@ -1,4 +1,3 @@
-from django.utils.six import python_2_unicode_compatible
 from future import standard_library
 standard_library.install_aliases()
 import simplejson as json
@@ -22,7 +21,6 @@ def versioned_model_pre_save(instance,*args,**kwargs):
 
 def simpleTitleComponent(field_name="title"):
 
-    @python_2_unicode_compatible
     class C(models.Model):
         class Meta:
             abstract = True
@@ -39,7 +37,6 @@ def do_text_markup(markup_language, content):
         content = textile.textile(content)
     return content
 
-@python_2_unicode_compatible
 class NamedTimeStampedModel(TimeStampedModel):
     class Meta:
         abstract = True

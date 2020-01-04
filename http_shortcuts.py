@@ -3,7 +3,6 @@ import simplejson as json
 
 from django.shortcuts import render as django_render
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect
-from django.utils.decorators import available_attrs
 
 from functools import wraps
 
@@ -25,7 +24,7 @@ def render(request, template, context = {}, ignore_ajax = False, obj=None, conte
     return response
     
 def permanent_redirect(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func)
     def wrapper(request, *args, **kw):
         to = view_func(request, *args, **kw)
         if isinstance(to, str):
@@ -35,7 +34,7 @@ def permanent_redirect(view_func):
     return wrapper
     
 def redirect(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func)
     def wrapper(request, *args, **kw):
         to = view_func(request, *args, **kw)
         if isinstance(to, str):
@@ -45,7 +44,7 @@ def redirect(view_func):
     return wrapper
 
 def render_json(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         _json = view_func(request, *args, **kwargs)
         if not isinstance(_json, str) and not isinstance(_json, dict) and not isinstance(_json, list) and not isinstance(_json, tuple):
@@ -55,7 +54,7 @@ def render_json(view_func):
 
 def render_to(template_name, ignore_ajax=False):
     def renderer(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def wrapper(request, *args, **kw):
             output = func(request, *args, **kw)
             if not isinstance(output, dict):

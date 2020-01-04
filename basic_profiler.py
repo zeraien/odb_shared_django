@@ -2,7 +2,6 @@ import logging
 import time
 import functools
 from django.conf import settings
-from django.utils.decorators import available_attrs
 
 logger = logging.getLogger("odb.profiler")
 
@@ -21,7 +20,7 @@ class Profile(object):
 
 
 def profiler(func):
-    @functools.wraps(func, assigned=available_attrs(func))
+    @functools.wraps(func)
     def call(*args, **kwargs):
         with Profile(func.__name__):
             return func(*args, **kwargs)

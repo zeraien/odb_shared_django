@@ -1,64 +1,54 @@
 from math import ceil, floor
 
-class Pagination(object):
-    def __init__(self, active_page, item_count, limit=50):
-        try:
-            self.active_page = max(int(active_page),1)
-        except (TypeError,ValueError):
-            self.active_page = 1
+from django.core.paginator import Paginator
 
-        try:
-            self.limit = max(int(limit),1)
-        except (TypeError,ValueError):
-            self.limit = 50
 
-        self.item_count = item_count
+class Pagination(Paginator):
+    def __init__(self,
+                 current_page_index,
+                 object_list,
+                 per_page=50,
+                 orphans=15,
+                 allow_empty_first_page=True,
+                 pages_to_show=7
+                 ):
+        self.pages_to_show = pages_to_show
+        self.current_page_index = int(current_page_index)
 
-        self.total_pages = max(int(ceil(self.item_count / self.limit)), 1)
-        self.active_page = min(max(int(self.active_page),1), self.total_pages)
+        super(Pagination, self).__init__(object_list=object_list,
+                                         per_page=per_page,
+                                         orphans=orphans,
+                                         allow_empty_first_page=allow_empty_first_page)
+    def get_active_page(self):
+        return self.get_page(self.current_page_index)
 
-        self._update_pagination_data()
+    def get_last_page(self):
+        return self.get_page(-1)
 
-    def _update_pagination_data(self):
+    def get_first_page(self):
+        return self.get_page(1)
 
-        pages_to_show = 7
-        if self.total_pages > pages_to_show:
+    def get_visible_pages(self):
+        pages_to_show = self.pages_to_show
+
+        if not self.count:
+            return []
+
+        if self.num_pages > pages_to_show:
             endpoints = int(floor(pages_to_show/2))
-            pages_to_show_start = self.active_page-1-endpoints
-            pages_to_show_end = self.active_page+endpoints
+            pages_to_show_start = self.current_page_index-1-endpoints
+            pages_to_show_end = self.current_page_index+endpoints
 
             if pages_to_show_start<0:
                 pages_to_show_end+=(pages_to_show_start*-1)
-            if self.active_page+endpoints>self.total_pages:
-                surplus = self.total_pages-self.active_page+endpoints
-                pages_to_show_start-=surplus
+            if pages_to_show_end>self.num_pages:
+                pages_to_show_start=self.num_pages-pages_to_show
 
-            if pages_to_show_start < 0:
-                pages_to_show_start = 0
-            if pages_to_show_end > self.total_pages:
-                pages_to_show_end = self.total_pages
+            pages_to_show_start = max(0,pages_to_show_start)
+            pages_to_show_end = min(self.num_pages, pages_to_show_end)
+
         else:
             pages_to_show_start = 0
-            pages_to_show_end = self.total_pages
+            pages_to_show_end = self.num_pages
 
-        pages = [{'start':p*self.limit,'number':i+1} for i,p in enumerate(range(0,self.total_pages))]
-        pages = pages[pages_to_show_start:pages_to_show_end]
-        subset_start = (self.active_page-1)*self.limit
-        subset_end = subset_start+self.limit
-
-        self.subset_start = subset_start
-        self.subset_end = subset_end
-        self.item_count = self.item_count
-        self.pages = pages
-        self.is_last_page = self.active_page>=self.total_pages
-        self.is_first_page = self.active_page<=1
-
-        self.previous_page = max(self.active_page - 1,1)
-        self.next_page = min(self.active_page+1, self.total_pages)
-
-        self.start = self.active_page*self.limit
-        self.next_page_start = self.next_page*self.limit
-        self.previous_page_start = self.previous_page*self.limit
-
-        self.prev_page = self.previous_page
-        self.prev_page_start = self.previous_page_start
+        return [self.get_page(i) for i in self.page_range[pages_to_show_start:pages_to_show_end]]

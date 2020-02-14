@@ -79,7 +79,7 @@ def sql_insert(table_name, data_list, single_query=False, update_if_exists=True)
                 cursor.execute(query, v)
                 yield cursor.lastrowid
     except TypeError as e:
-        get_logger().exception("Error in SQL Query for table: %s" % table_name, exc_info=1)
+        get_logger().exception("Error in SQL Query for table: %s" % table_name, exc_info=True)
         reraise(e)
     cursor.close()
 

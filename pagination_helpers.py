@@ -17,11 +17,13 @@ class Pagination(object):
         self.total_pages = max(int(ceil(self.item_count / self.limit)), 1)
         self.active_page = min(max(int(self.active_page),1), self.total_pages)
 
+        self._pages_to_show = 7
+
         self._update_pagination_data()
 
     def _update_pagination_data(self):
 
-        pages_to_show = 7
+        pages_to_show = self._pages_to_show
         if self.total_pages > pages_to_show:
             endpoints = int(floor(pages_to_show/2))
             pages_to_show_start = self.active_page-1-endpoints
@@ -50,6 +52,7 @@ class Pagination(object):
         self.subset_end = subset_end
         self.item_count = self.item_count
         self.pages = pages
+        self.last_page = {'start':self.total_pages*self.limit,'number':self.total_pages}
         self.is_last_page = self.active_page>=self.total_pages
         self.is_first_page = self.active_page<=1
 
@@ -62,3 +65,8 @@ class Pagination(object):
 
         self.prev_page = self.previous_page
         self.prev_page_start = self.previous_page_start
+
+    def has_multiple_pages(self):
+        return self.total_pages>1
+    def has_more_pages(self):
+        return self.total_pages>self._pages_to_show and self.pages[-1]['number']!=self.last_page['number']

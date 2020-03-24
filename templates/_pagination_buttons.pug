@@ -1,0 +1,26 @@
+.btn-group(role="group")
+
+    if not pagination.is_first_page
+        button.btn.btn-default(type="button", onclick="set_page({{pagination.previous_page}},{{pagination.previous_page_start}});") {{_("newer")}}
+    else
+        button.btn.btn-default(disabled="disabled") {{_("newer")}}
+
+    for page in pagination.pages
+        button.btn(
+            class=(page["number"]==pagination.active_page and "btn-info" or "btn-default"),
+            type='button', onclick="set_page({{page.number}},{{page.start}});") {{page.number}}
+    if pagination.has_more_pages
+        button.btn.btn-default(
+            type='button', onclick="set_page({{pagination.last_page.number}},{{pagination.last_page.start}});") &#8230;
+
+    if not pagination.is_last_page
+        button.btn.btn-default(type="button", onclick="set_page({{pagination.next_page}},{{pagination.next_page_start}});") {{_("older")}}
+    else
+        button.btn.btn-default(disabled="disabled") {{_("older")}}
+
+script.
+    function set_page(active_page, start)
+    {
+        content_manager.set('start', start);
+        content_manager.set('active_page',active_page);
+    }

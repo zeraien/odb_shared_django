@@ -52,3 +52,8 @@ class Pagination(Paginator):
             pages_to_show_end = self.num_pages
 
         return [self.get_page(i) for i in self.page_range[pages_to_show_start:pages_to_show_end]]
+
+    def has_multiple_pages(self):
+        return self.num_pages>1
+    def has_more_pages(self):
+        return self.get_visible_pages()[-1].has_next()

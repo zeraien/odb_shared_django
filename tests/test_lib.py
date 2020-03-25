@@ -8,10 +8,10 @@ from ..lib import make_query_string_from_data
 class TestMakeQueryString(TestCase):
     def test_make_query_string_from_unicode_data(self):
         q = make_query_string_from_data(foo=u"barä", baz="bazinga")
-        self.assertEqual(q,u"baz=bazinga&foo=barä")
+        self.assertEqual(q,"baz=bazinga&foo=barä")
 
         q = make_query_string_from_data(foo=[u"barä","far"], baz="bazinga")
-        self.assertEqual(q,u"baz=bazinga&foo=[barä,far]")
+        self.assertEqual(q,"baz=bazinga&foo=[barä,far]")
 
     def test_make_query_string_from_data(self):
         # regular test
@@ -29,6 +29,6 @@ class TestMakeQueryString(TestCase):
             baz="lorem ipsum dolor metis poop",
             oswald="brah brass bruh bri brack",
             poop="pipipi piri piri sauce")
-        h = hashlib.sha1("baz=lorem ipsum dolor metis poop&foo=bar baz brah bilar bilar&oswald=brah brass bruh bri brack&poop=pipipi piri piri sauce").hexdigest()
+        h = hashlib.sha1("baz=lorem ipsum dolor metis poop&foo=bar baz brah bilar bilar&oswald=brah brass bruh bri brack&poop=pipipi piri piri sauce".encode("utf8")).hexdigest()
         self.assertEqual("baz=lorem ipsum dolor metis poop&foo=bar baz brah bilar bil-%s"%h,q)
         self.assertEqual(maxlen, len(q))

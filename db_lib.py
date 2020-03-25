@@ -18,7 +18,8 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
         wheres.append("D0.%%(id_param_name)s IN (%s)" % ",".join([str(s) for s in limit_to_ids]))
 
     for index, data_pair in enumerate(data_pairs, start=0):
-        assert isinstance(data_pair, (list,tuple))
+        if not isinstance(data_pair, (list,tuple)):
+            raise ValueError("Data should be in the format [[k,v],...]")
         key, value = data_pair[0],data_pair[1]
         prefix = "D%s"%index
         if index>0:
@@ -33,16 +34,16 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
         wheres.append("""(%(prefix)s.key="%(key)s" AND %(prefix)s.value IN (%(val)s))""" % {
             "prefix":prefix,
             "key":key,
-            "val": '"%s"' % '","'.join([unicode(v).encode("utf8") for v in mklist(value)])
+            "val": '"%s"' % '","'.join([str(v) for v in mklist(value)])
         })
     #py3
-    wheres_str = " AND ".join(wheres)
-    query = u"""
+    wheres_str = " AND ".join(wheres).strip()
+    query = """
     SELECT D0.%%(id_param_name)s as `id`
      FROM %(from)s WHERE 
      %(where)s
      GROUP BY D0.%%(id_param_name)s
       ORDER BY D0.%%(id_param_name)s""" %\
-    {'from': " LEFT JOIN ".join(tables),
-     'where': wheres_str.decode("utf8")} % {'id_param_name': id_param_name}
-    return query
+    {'from': " LEFT JOIN ".join(tables).strip(),
+     'where': wheres_str} % {'id_param_name': id_param_name}
+    return " ".join([line.strip() for line in query.strip().splitlines()])

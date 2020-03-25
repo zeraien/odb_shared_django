@@ -35,12 +35,12 @@
             <label class="control-label col-sm-3">{{ widget.label }}</label>
 
             {% for sub_widget in widget %}
-            <div class="col-sm-offset-3 col-sm-9">
-                <div class="checkbox">
-                    {{ sub_widget }} {{ sub_widget.label }}
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="checkbox">
+                        {{ sub_widget }} {{ sub_widget.label }}
+                    </div>
+                    {% include "bootstrap_form/_help_block.html" %}
                 </div>
-                {% include "bootstrap_form/_help_block.html" %}
-            </div>
             {% endfor %}
         {% else %}
             <label class="control-label col-sm-3" for="{{ widget.auto_id }}">{{ widget.label }}</label>

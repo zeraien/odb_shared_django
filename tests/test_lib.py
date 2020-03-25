@@ -10,6 +10,8 @@ class TestMakeQueryString(TestCase):
         q = make_query_string_from_data(foo=u"barä", baz="bazinga")
         self.assertEqual(q,u"baz=bazinga&foo=barä")
 
+        q = make_query_string_from_data(foo=[u"barä","far"], baz="bazinga")
+        self.assertEqual(q,u"baz=bazinga&foo=[barä,far]")
 
     def test_make_query_string_from_data(self):
         # regular test
@@ -22,7 +24,7 @@ class TestMakeQueryString(TestCase):
         # too long
         maxlen = 100
         q = make_query_string_from_data(
-            max_length_=maxlen,
+            _max_length=maxlen,
             foo="bar baz brah bilar bilar",
             baz="lorem ipsum dolor metis poop",
             oswald="brah brass bruh bri brack",

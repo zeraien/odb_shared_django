@@ -400,12 +400,18 @@ def round_off(date_obj, round_to = 15):
                              microseconds=date_obj.microsecond)
     return date_obj
 
-def add_date_to_time(date_, time_, tzinfo=None):
+def add_date_to_time(date_, time_, tzname:str=None):
     if None in (time_, date_):
         return None
-    return datetime.datetime(year=date_.year, month=date_.month, day=date_.day,
-                             hour=time_.hour, minute=time_.minute,
-                             tzinfo=tzinfo)
+    dt = datetime.datetime(year=date_.year, month=date_.month, day=date_.day,
+                             hour=time_.hour, minute=time_.minute)
+    if tzname:
+        if isinstance(tzname,str):
+            tz = pytz.timezone(tzname)
+        else:
+            tz = tzname
+        dt = tz.localize(dt)
+    return dt
 
 def pretty_duration(sec):
     is_negative = sec<0

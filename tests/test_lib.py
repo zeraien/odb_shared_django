@@ -13,6 +13,10 @@ class TestMakeQueryString(TestCase):
         q = make_query_string_from_data(foo=[u"barä","far"], baz="bazinga")
         self.assertEqual(q,"baz=bazinga&foo=[barä,far]")
 
+    def test_make_query_string_with_ints(self):
+        q = make_query_string_from_data(**{'test':[4,"ÄFOO","BAR"]})
+        self.assertEqual(q,"test=[4,ÄFOO,BAR]")
+
     def test_make_query_string_from_data(self):
         # regular test
         q = make_query_string_from_data(foo="bar")

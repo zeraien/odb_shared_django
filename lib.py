@@ -1,4 +1,6 @@
 import hashlib
+from functools import reduce
+
 
 def make_query_string_from_data(_max_length=191, **kwargs):
     if _max_length<100:
@@ -8,9 +10,8 @@ def make_query_string_from_data(_max_length=191, **kwargs):
         if isinstance(val, (list,tuple)):
             l = []
             for subval in val:
-                print(subval)
                 l.append(subval)
-            l = ",".join(l)
+            l = ",".join(map(str,l))
             return "[%s]"%l
         return val
     if len(kwargs)==0:

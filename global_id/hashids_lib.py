@@ -2,6 +2,9 @@ import hashids
 from django.conf import settings
 from django.utils.translation import gettext
 
+from .exceptions import DecodeHashidError
+
+
 def encode_id(*real_id, generator=None):
     if not generator:
         generator = hashids.Hashids(salt=settings.HASHID_SALT, min_length=7)

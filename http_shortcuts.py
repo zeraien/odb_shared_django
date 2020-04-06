@@ -1,5 +1,5 @@
 import os.path
-import simplejson as json
+import json
 
 from django.shortcuts import render as django_render
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponsePermanentRedirect

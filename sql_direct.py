@@ -87,6 +87,7 @@ def sql_insert(table_name, data_list, single_query=False, update_if_exists=True,
     )
 
     query = _sql_insert_command(on_duplicate_update=do_update_if_exists,
+                                is_sqlite=is_sqlite,
                                 unique_keys=unique_keys)
     if not do_update_if_exists:
         query = query % sql_replacement
@@ -117,11 +118,11 @@ def sql_insert(table_name, data_list, single_query=False, update_if_exists=True,
         reraise(e)
     cursor.close()
 
-def _sql_insert_command(on_duplicate_update=True, unique_keys=None):
+def _sql_insert_command(on_duplicate_update=True, is_sqlite=False, unique_keys=None):
 
     if not on_duplicate_update:
         return "INSERT INTO %(table_name)s (%(column_names)s) VALUES %(values_placeholders)s"
-    elif unique_keys and len(unique_keys):
+    elif is_sqlite and unique_keys and len(unique_keys):
         upsert = " ON CONFLICT(%s) DO UPDATE SET %%(update_query)s" % ",".join(["`%s`"%k for k in unique_keys])
         return "INSERT INTO %(table_name)s (%(column_names)s) VALUES %(values_placeholders)s"+upsert
     else:

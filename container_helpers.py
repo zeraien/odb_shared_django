@@ -15,7 +15,7 @@ def mklist(value):
     """
     try:
         if not isinstance(value, str):
-            f = iter(value)
+            iter(value)
             return value
     except TypeError:
         pass

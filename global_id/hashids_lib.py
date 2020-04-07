@@ -4,14 +4,16 @@ from django.utils.translation import gettext
 
 from .exceptions import DecodeHashidError
 
+def get_hashids(salt=settings.HASHID_SALT, min_length=7, alphabet=hashids.Hashids.ALPHABET):
+    return hashids.Hashids(salt=salt, min_length=min_length, alphabet=alphabet)
 
 def encode_id(*real_id, generator=None):
     if not generator:
-        generator = hashids.Hashids(salt=settings.HASHID_SALT, min_length=7)
+        generator = get_hashids()
     return generator.encode(*real_id)
 def decode_id(hash_id, generator = None):
     if not generator:
-        generator = hashids.Hashids(salt=settings.HASHID_SALT, min_length=7)
+        generator = get_hashids()
     l = generator.decode(hash_id)
     if len(l) == 1:
         return l[0]
@@ -33,7 +35,7 @@ def decode_identifier(identifier, version, keys, generator=None):
     values = decode_id(identifier, generator=generator)
     try:
         decoded_version = values[0]
-    except IndexError as e:
+    except (IndexError,TypeError) as e:
         raise DecodeHashidError(gettext("Identifier could not be decoded: %s") % e)
     if version == decoded_version:
         d = dict()

@@ -9,18 +9,22 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
     :param str id_param_name: the name of the id column for the parent table
     :param str table_name: table name of the key/value pair table
     :param list[int] limit_to_ids: limit the query to the parent ids
-    :returns str: the database query with one `id` column being the `id` of the entries in the parent table.
+    :returns (str,dict): the database query with one `id` column being the `id` of the entries in the parent table and a dictionary with the values.
     """
 
     tables = []
     wheres = []
+    value_list = {}
     if limit_to_ids:
-        wheres.append("D0.%%(id_param_name)s IN (%s)" % ",".join([str(s) for s in limit_to_ids]))
+        wheres.append("D0.%%(id_param_name)s IN (%s)" % ",".join(["%%%%(id%s)s"%i for i,s in enumerate(range(len(limit_to_ids)))]))
+        value_list.update({"id%s"%i:s for i,s in enumerate(limit_to_ids)})
 
     for index, data_pair in enumerate(data_pairs, start=0):
         if not isinstance(data_pair, (list,tuple)):
             raise ValueError("Data should be in the format [[k,v],...]")
         key, value = data_pair[0],data_pair[1]
+        # if issubclass(value.__class__,'hashid_field.Hashid'):
+        #     value = int(value)
         prefix = "D%s"%index
         if index>0:
             on = "ON D%s.%%(id_param_name)s = D%s.%%(id_param_name)s" % (index-1, index)
@@ -31,11 +35,14 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
             'table':table_name,
             "prefix":prefix
         })
-        wheres.append("""(%(prefix)s.key="%(key)s" AND %(prefix)s.value IN (%(val)s))""" % {
+        _value_list = mklist(value)
+        wheres.append("""(%(prefix)s.key=%(key)s AND %(prefix)s.value IN (%(val)s))""" % {
             "prefix":prefix,
-            "key":key,
-            "val": '"%s"' % '","'.join([str(v) for v in mklist(value)])
+            "key": "%%%%(key%s)s"%index,
+            "val": ','.join(["%%%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
         })
+        value_list['key%s'%index] = key
+        value_list.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
     #py3
     wheres_str = " AND ".join(wheres).strip()
     query = """
@@ -46,4 +53,4 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
       ORDER BY D0.%%(id_param_name)s""" %\
     {'from': " LEFT JOIN ".join(tables).strip(),
      'where': wheres_str} % {'id_param_name': id_param_name}
-    return " ".join([line.strip() for line in query.strip().splitlines()])
+    return " ".join([line.strip() for line in query.strip().splitlines()]), value_list

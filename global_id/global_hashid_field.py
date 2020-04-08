@@ -56,6 +56,8 @@ class GlobalHashidDescriptor(HashidDescriptor):
                 instance.__dict__[self.name] = value
 
 
+class PlaceholderHashidAutoField(HashidAutoField):
+    pass
 
 def GlobalHashidAutoFieldFactory(model_name):
     assert model_name not in _ALREADY_REGISTERED, "Failed to register `%s` with hashidAutoPk, because it's already registered"%model_name
@@ -85,8 +87,10 @@ def GlobalHashidAutoFieldFactory(model_name):
     _ALREADY_REGISTERED.append(model_name)
 
     model_class_name = model_name.rsplit('.',1)[-1]
-    newclass = type('%sGlobalHashidAutoField' % model_class_name,
-                    (GlobalHashidAutoField,),
-                    {}
-                    )
+    newclass = type(
+        'PlaceholderHashidAutoField',
+        # '%sGlobalHashidAutoField' % model_class_name,
+        (GlobalHashidAutoField,),
+        {}
+    )
     return newclass

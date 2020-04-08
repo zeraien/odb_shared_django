@@ -318,7 +318,7 @@ def get_gap_ranges_from_dates(dates, start_date, end_date, max_days_per_range=30
 
     return ranges
 
-def to_date_object(date_or_datetime_object):
+def to_date_object(date_or_datetime_object)->datetime.date:
     if isinstance(date_or_datetime_object, datetime.datetime):
         return date_or_datetime_object.date()
     elif isinstance(date_or_datetime_object, datetime.date):

@@ -1,6 +1,9 @@
 import logging
 from django.contrib.contenttypes.models import ContentType
+from django.apps import apps
 from hashid_field import Hashid
+
+from . import DecodeHashidError
 from .hashids_lib import generate_identifier, decode_identifier
 
 GLOBAL_ID_VERSION = 1
@@ -19,15 +22,23 @@ def generate_global_id(instance, generator=None):
     :return: The global id
     """
     pk = isinstance(instance.pk,Hashid) and instance.pk.id or instance.pk
-    return generate_global_id_for_model_name_and_pk(
-        model_name='.'.join((instance._meta.app_label,instance._meta.model_name)),
-        pk=pk,
-        generator=generator)
+    ct = ContentType.objects.get_for_model(instance)
+
+    return generate_identifier(
+        generator=generator,
+        version=GLOBAL_ID_VERSION,
+        content_type=ct.pk,
+        pk=pk
+    )
 
 def generate_global_id_for_model_name_and_pk(model_name, pk, generator=None):
-    app_label, model_name = model_name.rsplit('.',1)
-    ct = ContentType.objects.get_by_natural_key(app_label=app_label,
-                                                model=model_name)
+    app_label, model_class_name = model_name.rsplit('.',1)
+    try:
+        model = apps.get_model(app_label=app_label, model_name=model_class_name)
+        ct = ContentType.objects.get_for_model(model)
+    except ContentType.DoesNotExist:
+        raise DecodeHashidError("Unable to find ContentType `%s`"%model_name)
+
     return generate_identifier(
         generator=generator,
         version=GLOBAL_ID_VERSION,

@@ -10,7 +10,7 @@ def get_hashids(salt=settings.HASHID_SALT, min_length=7, alphabet=hashids.Hashid
 def encode_id(*real_id, generator=None):
     if not generator:
         generator = get_hashids()
-    return generator.encode(*real_id)
+    return generator.encode(*map(int,real_id))
 def decode_id(hash_id, generator = None):
     if not generator:
         generator = get_hashids()

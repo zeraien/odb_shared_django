@@ -16,7 +16,7 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
     wheres = []
     value_list = {}
     if limit_to_ids:
-        wheres.append("D0.%%(id_param_name)s IN (%s)" % ",".join(["%%%%(id%s)s"%i for i,s in enumerate(range(len(limit_to_ids)))]))
+        wheres.append("D0.{id_param_name} IN (%s)" % ",".join(["%%(id%s)s"%i for i,s in enumerate(range(len(limit_to_ids)))]))
         value_list.update({"id%s"%i:s for i,s in enumerate(limit_to_ids)})
 
     for index, data_pair in enumerate(data_pairs, start=0):
@@ -27,7 +27,7 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
         #     value = int(value)
         prefix = "D%s"%index
         if index>0:
-            on = "ON D%s.%%(id_param_name)s = D%s.%%(id_param_name)s" % (index-1, index)
+            on = "ON D%s.{id_param_name} = D%s.{id_param_name}" % (index-1, index)
         else:
             on = ""
         tables.append("%(table)s as %(prefix)s %(on)s" % {
@@ -38,19 +38,19 @@ def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids
         _value_list = mklist(value)
         wheres.append("""(%(prefix)s.key=%(key)s AND %(prefix)s.value IN (%(val)s))""" % {
             "prefix":prefix,
-            "key": "%%%%(key%s)s"%index,
-            "val": ','.join(["%%%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
+            "key": "%%(key%s)s"%index,
+            "val": ','.join(["%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
         })
         value_list['key%s'%index] = key
         value_list.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
     #py3
     wheres_str = " AND ".join(wheres).strip()
-    query = """
-    SELECT D0.%%(id_param_name)s as `id`
+    query = ("""
+    SELECT D0.{id_param_name} as `id`
      FROM %(from)s WHERE 
      %(where)s
-     GROUP BY D0.%%(id_param_name)s
-      ORDER BY D0.%%(id_param_name)s""" %\
+     GROUP BY D0.{id_param_name}
+      ORDER BY D0.{id_param_name}""" %\
     {'from': " LEFT JOIN ".join(tables).strip(),
-     'where': wheres_str} % {'id_param_name': id_param_name}
+     'where': wheres_str}).format(**{'id_param_name': id_param_name})
     return " ".join([line.strip() for line in query.strip().splitlines()]), value_list

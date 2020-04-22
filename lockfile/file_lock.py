@@ -17,7 +17,7 @@ import logging
 import random
 from odb_shared import get_logger
 
-logger = get_logger("lockfile")
+logger = get_logger("lockfile.file_lock")
 
 class Lockfile(object):
     """A simple lockfile class with a timer, lockfile expires after the set timeout."""

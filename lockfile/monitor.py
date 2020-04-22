@@ -18,7 +18,7 @@ import logging
 import hashlib
 from odb_shared import get_logger
 from .exceptions import LockfileExistsException
-from . import CacheLock, RedisLock
+from . import RedisLock
 
 logger = get_logger("lockfile")
 
@@ -40,7 +40,7 @@ class Monitor(ContextDecorator):
      If passing `raise_if_already_locked`, the monitor will raise `LockfileExistsException` if
      the lockfile already exists when this monitor is poked.
     """
-    def __init__(self, name, data, timeout=180, raise_if_already_locked=False):
+    def __init__(self, name, data, timeout=180, raise_if_already_locked=False, lockfile_klass=RedisLock):
 
         if timeout is None: timeout = 0
 
@@ -49,7 +49,7 @@ class Monitor(ContextDecorator):
         self.raise_if_already_locked = raise_if_already_locked
         self.name = name
         self.digest = hashlib.sha1((smart_text(data) + name).encode("utf8")).hexdigest() + '-' + smart_text(name)
-        self.lockfile = RedisLock(self.digest, timeout=timeout)
+        self.lockfile = lockfile_klass(self.digest, timeout=timeout)
 
 
     def __enter__(self):
@@ -64,7 +64,7 @@ class Monitor(ContextDecorator):
                 logger.debug("Monitor [%s] lockfile found" % self.name)
             raise LockfileExistsException("[%s] already locked with [%s], bailing out."% (self.name,self.lockfile))
 
-        interval = 0.1
+        interval = 0.5
 
         while lockfile_exists and (self.timeout > 0 and self.running_time <= self.timeout):
             self.running_time += interval

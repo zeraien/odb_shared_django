@@ -31,7 +31,7 @@ import hashlib
 from odb_shared import get_logger
 from django.core.cache import cache
 
-logger = get_logger("lockfile")
+logger = get_logger("lockfile.cache_lock")
 
 class CacheLock(object):
     def __init__(self, filename, timeout=None):

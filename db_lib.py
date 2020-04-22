@@ -1,15 +1,30 @@
+from typing import Iterable, Union, Dict, Any
+
 from .container_helpers import mklist
 
-def get_query_for_data_pairs(data_pairs, id_param_name, table_name, limit_to_ids=None):
+def get_query_for_data_pairs(
+        data_pairs:Iterable[Iterable],
+        id_param_name:str,
+        table_name:str,
+        limit_to_ids:Iterable[Union[str,int]]=None) -> (str,Dict[str,Any]):
     """
     When storing data with name/value pairs, if you need to retrieve a grouping of name/value
     pairs, use this.
+    Meaning you have key/value columns, like so:
+    id | key | value | parent_id
+     #   foo   bar        1
+     #   foo   baz        2
+     #   user   3         1
+     #   user   4         2
 
-    :param list[list or tuple[str,Any]] data_pairs: a list of data pair lists `[[key,value],....]`
-    :param str id_param_name: the name of the id column for the parent table
-    :param str table_name: table name of the key/value pair table
-    :param list[int] limit_to_ids: limit the query to the parent ids
-    :returns (str,dict): the database query with one `id` column being the `id` of the entries in the parent table and a dictionary with the values.
+    If you wish to retrieve certain pairings, like you want all user=3 AND foo=baz, you'll get a
+    query that will get you the list of all parent id's matching that. In the example above, it's [1].
+
+    :param data_pairs: a list of data pair lists `[[key,value],....]`
+    :param id_param_name: the name of the id column for the parent table
+    :param table_name: table name of the key/value pair table
+    :param limit_to_ids: limit the query to the parent ids
+    :returns : the database query with one `id` column being the `id` of the entries in the parent table and a dictionary with the values.
     """
 
     tables = []

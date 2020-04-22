@@ -1,0 +1,1 @@
+class LockfileExistsException(Exception): pass

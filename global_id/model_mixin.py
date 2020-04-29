@@ -1,6 +1,7 @@
 from .global_hashid_field import GlobalHashidAutoFieldFactory
 from django.db import models
 
+#todo rename to something with Mixin
 def GlobalHashidModelFactory(model_name):
     """
     Pass a model name as you would in django, with `app_label.model_name`.

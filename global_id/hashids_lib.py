@@ -43,7 +43,7 @@ def decode_identifier(identifier, version, keys, generator=None):
         for index, key in enumerate(keys, start=1):
             d[key] = values[index]
     else:
-        raise DecodeHashidError(gettext("Identifier could not be decoded: %s.") % gettext("version mismatch"))
+        raise DecodeHashidError(gettext("Identifier could not be decoded: %s") % gettext("version mismatch"))
     return d
 
 def generate_identifier(version, generator=None, **kwargs):

@@ -1,5 +1,3 @@
-from future.utils import raise_with_traceback
-
 from .container_helpers import multikeysort, dict_from_list, slice_generator, group_by_key
 
 __author__ = 'zeraien'
@@ -13,5 +11,7 @@ def get_logger(extra_funnel=None):
         funnel = '.'.join((funnel,extra_funnel))
     return logging.getLogger(funnel)
 
-def reraise(exception):
-    raise_with_traceback(exception)
+def reraise(exc:Exception, traceback=Ellipsis):
+    if traceback == Ellipsis:
+        _, _, traceback = sys.exc_info()
+    raise exc.with_traceback(traceback)

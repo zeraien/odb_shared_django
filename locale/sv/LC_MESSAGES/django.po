@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-14 16:56+0200\n"
+"POT-Creation-Date: 2020-05-05 18:56+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,21 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Identifier could not be decoded: %s"
+msgstr "Identifieraren kunde inte avkodas: %s"
+
+msgid "version mismatch"
+msgstr "fel version"
+
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Objektet %s hittades inte med nuvarande sökfråga."
+
+#, python-format
+msgid "%s is an invalid ID."
+msgstr "%s är ett ogiltigt ID."
 
 msgid "version"
 msgstr "version"
@@ -35,6 +50,21 @@ msgstr "Pengar"
 
 msgid "hidden"
 msgstr "dold"
+
+msgid "note"
+msgstr "anteckning"
+
+msgid "notes"
+msgstr "anteckningar"
+
+msgid "markup language"
+msgstr "markup-språk"
+
+msgid "newer"
+msgstr "nyare"
+
+msgid "older"
+msgstr "äldre"
 
 msgid "Please correct the errors in the form and try again."
 msgstr "Vänligen rätta felen i formuläret och försök igen."

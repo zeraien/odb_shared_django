@@ -221,10 +221,8 @@ def from_epoch(epo):
     :return: Datetime object
     """
     if epo is None:
-        return timezone.make_aware(timezone.datetime(1970,1,1), timezone.utc)
-
-
-    return timezone.make_aware(timezone.datetime.utcfromtimestamp(int(epo)), timezone.utc)
+        epo = 0
+    return pytz.UTC.localize(datetime.datetime.utcfromtimestamp(int(epo)))
 
 def chunks(l, chunk_size):
     """ Yield successive n-sized chunks from l.

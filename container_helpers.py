@@ -1,7 +1,6 @@
-from past.builtins import cmp
-from builtins import str
-from builtins import range
 from collections import OrderedDict
+from functools import cmp_to_key
+
 
 def mklist(value):
     """
@@ -74,15 +73,32 @@ def dict_from_list(the_list, key):
             the_dict[getattr(item,key)] = item
     return the_dict
 
+def _cmp(x, y):
+    """
+    Replacement for built-in function cmp that was removed in Python 3
+
+    Compare the two objects x and y and return an integer according to
+    the outcome. The return value is negative if x < y, zero if x == y
+    and strictly positive if x > y.
+    """
+
+    return (x > y) - (x < y)
+
 #http://stackoverflow.com/a/1144405/144838
 def multikeysort(items, columns):
+    """
+    Sort a list of dicts on all given columns, in the order of the columns.
+    :param items:
+    :param columns: A list of columns to sort on, if a column starts with `-`, it should be sorted in reverse.
+    :return: sorted `dict`
+    """
     from operator import itemgetter
     comparers = [ ((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1)) for col in columns]
     def comparer(left, right):
-        for fn, mult in comparers:
-            result = cmp(fn(left), fn(right))
+        for get_value, mult in comparers:
+            result = _cmp(get_value(left), get_value(right))
             if result:
                 return mult * result
         else:
             return 0
-    return sorted(items, cmp=comparer)
+    return sorted(items, key=cmp_to_key(comparer))

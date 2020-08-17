@@ -1,4 +1,4 @@
-from typing import Iterable, Union, Dict, Any
+from typing import Iterable, Union, Dict, Any, Sized
 
 from .container_helpers import mklist
 
@@ -25,6 +25,7 @@ def get_query_for_data_pairs(
     :param table_name: table name of the key/value pair table
     :param limit_to_ids: limit the query to the parent ids
     :returns : the database query with one `id` column being the `id` of the entries in the parent table and a dictionary with the values.
+    :raises ValueError: if invalid data pair is supplied
     """
 
     tables = []
@@ -51,21 +52,25 @@ def get_query_for_data_pairs(
             "prefix":prefix
         })
         _value_list = mklist(value)
-        wheres.append("""(%(prefix)s.key=%(key)s AND %(prefix)s.value IN (%(val)s))""" % {
-            "prefix":prefix,
-            "key": "%%(key%s)s"%index,
-            "val": ','.join(["%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
-        })
-        value_list['key%s'%index] = key
-        value_list.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
+        if len(_value_list):
+            wheres.append("""(%(prefix)s.key=%(key)s AND %(prefix)s.value IN (%(val)s))""" % {
+                "prefix":prefix,
+                "key": "%%(key%s)s"%index,
+                "val": ','.join(["%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
+            })
+            value_list['key%s'%index] = key
+            value_list.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
+
     #py3
-    wheres_str = " AND ".join(wheres).strip()
+    wheres_str = len(wheres) and ("WHERE %s" % " AND ".join(wheres).strip()) or ""
     query = ("""
     SELECT D0.{id_param_name} as `id`
-     FROM %(from)s WHERE 
+     FROM %(from)s
      %(where)s
      GROUP BY D0.{id_param_name}
-      ORDER BY D0.{id_param_name}""" %\
+      ORDER BY D0.{id_param_name}""" %
     {'from': " LEFT JOIN ".join(tables).strip(),
      'where': wheres_str}).format(**{'id_param_name': id_param_name})
-    return " ".join([line.strip() for line in query.strip().splitlines()]), value_list
+    q,v = " ".join([line.strip() for line in query.strip().splitlines()]), value_list
+    print(q,v)
+    return q,v

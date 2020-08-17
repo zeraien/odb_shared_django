@@ -1,5 +1,3 @@
-from future import standard_library
-standard_library.install_aliases()
 import json
 from django.core import exceptions as django_exceptions
 from django.db import models

@@ -72,5 +72,4 @@ def get_query_for_data_pairs(
     {'from': " LEFT JOIN ".join(tables).strip(),
      'where': wheres_str}).format(**{'id_param_name': id_param_name})
     q,v = " ".join([line.strip() for line in query.strip().splitlines()]), value_list
-    print(q,v)
     return q,v

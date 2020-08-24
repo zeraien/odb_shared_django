@@ -1,4 +1,4 @@
-from typing import Iterable, Union, Dict, Any, Sized
+from typing import Iterable, Union, Dict, Any
 
 from .container_helpers import mklist
 
@@ -6,7 +6,9 @@ def get_query_for_data_pairs(
         data_pairs:Iterable[Iterable],
         id_param_name:str,
         table_name:str,
-        limit_to_ids:Iterable[Union[str,int]]=None) -> (str,Dict[str,Any]):
+        limit_to_ids:Iterable[Union[str,int]]=None,
+        use_dict_params=False
+) -> (str,Dict[str,Any]):
     """
     When storing data with name/value pairs, if you need to retrieve a grouping of name/value
     pairs, use this.
@@ -20,20 +22,23 @@ def get_query_for_data_pairs(
     If you wish to retrieve certain pairings, like you want all user=3 AND foo=baz, you'll get a
     query that will get you the list of all parent id's matching that. In the example above, it's [1].
 
+    If using `use_dict_params`, all non-primitive datatypes are converted into a `str`.
+
     :param data_pairs: a list of data pair lists `[[key,value],....]`
     :param id_param_name: the name of the id column for the parent table
     :param table_name: table name of the key/value pair table
     :param limit_to_ids: limit the query to the parent ids
+    :param use_dict_params: returns a query either with %(key)s style params, or just %s list based placeholders. SQLite doesn't support dict placeholders.
     :returns : the database query with one `id` column being the `id` of the entries in the parent table and a dictionary with the values.
     :raises ValueError: if invalid data pair is supplied
     """
 
     tables = []
     wheres = []
-    value_list = {}
+    value_dict = {}
     if limit_to_ids:
         wheres.append("D0.{id_param_name} IN (%s)" % ",".join(["%%(id%s)s"%i for i,s in enumerate(range(len(limit_to_ids)))]))
-        value_list.update({"id%s"%i:s for i,s in enumerate(limit_to_ids)})
+        value_dict.update({"id%s"%i:s for i,s in enumerate(limit_to_ids)})
 
     for index, data_pair in enumerate(data_pairs, start=0):
         if not isinstance(data_pair, (list,tuple)):
@@ -58,8 +63,8 @@ def get_query_for_data_pairs(
                 "key": "%%(key%s)s"%index,
                 "val": ','.join(["%%(val%s.%s)s"%(index,i) for i,v in enumerate(range(len(_value_list)))])
             })
-            value_list['key%s'%index] = key
-            value_list.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
+            value_dict['key%s'%index] = key
+            value_dict.update({"val%s.%s"%(index,i):s for i,s in enumerate(_value_list)})
 
     #py3
     wheres_str = len(wheres) and ("WHERE %s" % " AND ".join(wheres).strip()) or ""
@@ -71,5 +76,25 @@ def get_query_for_data_pairs(
       ORDER BY D0.{id_param_name}""" %
     {'from': " LEFT JOIN ".join(tables).strip(),
      'where': wheres_str}).format(**{'id_param_name': id_param_name})
-    q,v = " ".join([line.strip() for line in query.strip().splitlines()]), value_list
-    return q,v
+    query = " ".join([line.strip() for line in query.strip().splitlines()])
+
+    if use_dict_params:
+        return query, value_dict
+    else:
+        import re
+        query_pieces = re.split(r"(%\([\w.]+\)s)", query)
+        new_query_pieces = []
+        values_list = []
+        for index, piece in enumerate(query_pieces):
+            m = re.match(r"%\(([\w.]+)\)s",piece)
+            if m:
+                key = m.group(1)
+                value = value_dict[key]
+                if not (value is None or isinstance(value,(float,bool,int,str))):
+                    value = str(value)
+                values_list.append(value)
+                new_query_pieces.append("%s")
+            else:
+                new_query_pieces.append(piece)
+
+        return "".join(new_query_pieces), values_list
